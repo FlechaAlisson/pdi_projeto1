@@ -4,19 +4,19 @@ import java.util.stream.Collectors;
 
 public class Project {
 
-    int HIGH = 9999;
-
-
-
-
-
 
 
     public static void main(String[] args) {
         Project p = new Project();
         fileHandler f = new fileHandler();
 
-        byte[] file = f.readFile("C:\\Users\\afcfl\\IdeaProjects\\projeto1_PDI\\src\\sky.png");
+        byte[] file = f.readFile("C:\\Users\\afcfl\\IdeaProjects\\projeto1_PDI\\src\\teste.txt");
+
+        for (byte b : file
+                ) {
+            System.out.println(b);
+            System.out.println("======");
+        }
 
         Map<Byte,Double> ocorrencia = p.prob(file);
 
@@ -31,17 +31,25 @@ public class Project {
 
     }
 
+
     private void comprimeFile(ArrayList<Byte> arrayByte, Map<Byte, Double> ocorrencia) {
         int high = 9999;
         int low = 0;
         NavigableMap <Byte, Double> myMap = transformaMapNavigableMap(ocorrencia);
-        double prob_inicial = myMap.get(arrayByte.get(0));
-        double prob_final = myMap.get(arrayByte.get(arrayByte.size() - 1));
+
         for (Byte b : arrayByte) {
+
+            double prob_inicial;
+            try {
+                prob_inicial = myMap.get(myMap.lowerKey(b));
+            }catch (NullPointerException e){
+                prob_inicial = 0;
+            }
+            double prob_final = myMap.get(b);
 
 
             System.out.println("===========================================================");
-
+            System.out.println(b);
             System.out.println("high: "+ high);
             System.out.println("low: "+ low);
             System.out.println("prob_inicial: " + prob_inicial);
@@ -53,13 +61,6 @@ public class Project {
             System.out.println("new_high: "+ high);
             System.out.println("new_low: "+ low);
 
-
-            try {
-                prob_inicial = myMap.get(myMap.lowerKey(b));
-            }catch (NullPointerException e){
-                prob_inicial = 0;
-            }
-            prob_final = myMap.get(b);
 
             System.out.println("new_prob_inicial: " + prob_inicial);
             System.out.println("new_prob_final: "+ prob_final);
