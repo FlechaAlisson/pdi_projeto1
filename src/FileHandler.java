@@ -27,22 +27,29 @@ public class FileHandler {
 
 
     public void writeFile(ArrayList<Integer> saida) {
-        byte[] data = new byte[saida.size()];
-        for (int i = 0; i < saida.size(); i++) {
-            data[i] =  saida.get(i).byteValue();
+
+        ByteArrayOutputStream bout = new ByteArrayOutputStream(saida.size() * 4);
+        DataOutputStream dout = new DataOutputStream(bout);
+        for (int i : saida
+        ) {
+            try {
+                dout.writeInt(i);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
+
+        FileOutputStream fout = null;
         try {
-            FileOutputStream f = new FileOutputStream(new File("saida.art"));
-            f.write(data,0,data.length);
-            f.flush();
-            f.close();
+            fout = new FileOutputStream("saida.art");
+            bout.writeTo(fout);
+            fout.flush();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
     }
+
 }

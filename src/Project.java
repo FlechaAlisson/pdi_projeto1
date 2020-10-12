@@ -10,7 +10,7 @@ public class Project {
         Project p = new Project();
         FileHandler f = new FileHandler();
 
-        byte[] file = f.readFile("C:\\Users\\afcfl\\IdeaProjects\\projeto1_PDI\\src\\4k.jpg");
+        byte[] file = f.readFile("C:\\Users\\afcfl\\IdeaProjects\\projeto1_PDI\\src\\teste.txt");
 
         Map<Byte,Double> ocorrencia = p.prob(file);
 
@@ -21,6 +21,8 @@ public class Project {
             arrayByte.add(b);
         }
         ArrayList<Integer> saida = p.comprimeFile(arrayByte,ocorrencia, false);
+        System.out.println(saida);
+        System.out.println(saida.size());
         f.writeFile(saida);
 
         long fim  = System.currentTimeMillis();
@@ -37,6 +39,7 @@ public class Project {
     private ArrayList<Integer> comprimeFile(ArrayList<Byte> arrayByte, Map<Byte, Double> ocorrencia, boolean verbose) {
         int high = 9999;
         int low = 0;
+        int underflow = 0;
         ArrayList<Integer> saida = new ArrayList<>();
         NavigableMap <Byte, Double> myMap = transformaMapNavigableMap(ocorrencia);
 
@@ -73,7 +76,13 @@ public class Project {
 
 
             while (ultimoDigitoHigh == ultimoDigitoLow || (high - low) < 10){
-                saida.add(ultimoDigitoHigh);
+                try{
+                    underflow = Math.multiplyExact(underflow,10);
+                    underflow = Math.addExact(underflow, ultimoDigitoHigh);
+                }catch (java.lang.ArithmeticException e){
+                    saida.add(underflow);
+                    underflow = 0;
+                }
                 ultimoDigitoHigh*= 1000;
                 ultimoDigitoLow*= 1000;
                 high = (high - ultimoDigitoHigh) * 10 + 9;
@@ -93,6 +102,9 @@ public class Project {
                 low/=10;
             }
 
+            if(underflow != 0){
+                saida.add(underflow);
+            }
             saida.add(low);
             if (verbose) System.out.println(saida);
 
