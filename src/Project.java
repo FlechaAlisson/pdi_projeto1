@@ -10,7 +10,7 @@ public class Project {
         Project p = new Project();
         FileHandler f = new FileHandler();
 
-        byte[] file = f.readFile("C:\\Users\\afcfl\\IdeaProjects\\projeto1_PDI\\src\\lenna.jpeg");
+        byte[] file = f.readFile("C:\\Users\\afcfl\\IdeaProjects\\projeto1_PDI\\src\\4k.jpg");
 
         Map<Byte,Double> ocorrencia = p.prob(file);
 
