@@ -10,20 +10,19 @@ public class Project {
         Project p = new Project();
         FileHandler f = new FileHandler();
 
-        byte[] file = f.readFile("C:\\Users\\afcfl\\IdeaProjects\\projeto1_PDI\\src\\foto.jpg");
+        byte[] file = f.readFile("C:\\Users\\afcfl\\IdeaProjects\\projeto1_PDI\\src\\lenna.jpeg");
 
         Map<Byte,Double> ocorrencia = p.prob(file);
 
 
-        //System.out.println(ocorrencia);
         //transforma o vetor de bytes em um arraylist
-        ArrayList<Byte> arrayByte = new ArrayList<Byte>();
-        for (int i = 0; i < file.length; i++) {
-            arrayByte.add(file[i]);
+        ArrayList<Byte> arrayByte = new ArrayList<>();
+        for (byte b : file) {
+            arrayByte.add(b);
         }
-        ArrayList<Integer> saida = p.comprimeFile(arrayByte,ocorrencia, true);
+        ArrayList<Integer> saida = p.comprimeFile(arrayByte,ocorrencia, false);
         f.writeFile(saida);
-        //System.out.println(saida);
+
         long fim  = System.currentTimeMillis();
         System.out.println("Tempo de execucao: " + (double) ((fim - inicio)) + " milissegundos" );
         //p.decompimeFile(saida,ocorrencia);
@@ -31,11 +30,7 @@ public class Project {
 
     }
 
-    private void decompimeFile(int saida, Map<Byte, Double> ocorrencia) {
-         byte[] file = null;
 
-
-    }
 
 
 
@@ -77,7 +72,7 @@ public class Project {
             int ultimoDigitoLow = low/1000;
 
 
-            while (ultimoDigitoHigh == ultimoDigitoLow || (high - low) > 10){
+            while (ultimoDigitoHigh == ultimoDigitoLow || (high - low) < 10){
                 saida.add(ultimoDigitoHigh);
                 ultimoDigitoHigh*= 1000;
                 ultimoDigitoLow*= 1000;
@@ -86,6 +81,8 @@ public class Project {
 
                 ultimoDigitoHigh = high/1000;
                 ultimoDigitoLow = low/1000;
+                if (verbose) System.out.println("underflow");
+
             }
             if (verbose) {
                 System.out.println("new_high: "+ high);
@@ -97,9 +94,8 @@ public class Project {
             }
 
             saida.add(low);
-            if (verbose){
-                System.out.println(low);
-            }
+            if (verbose) System.out.println(saida);
+
             return saida;
     }
 
@@ -117,18 +113,16 @@ public class Project {
 
     private Map<Byte, Double> prob(byte[] file) {
         Map<Byte, Double> prob = new HashMap<>();
-        for (int i = 0; i < file.length; i++) {
-            if (prob.containsKey(file[i])){
-                prob.put(file[i], prob.get(file[i]) + 1);
-            }else {
-                prob.put(file[i], (double) 1);
+        for (byte b : file) {
+            if (prob.containsKey(b)) {
+                prob.put(b, prob.get(b) + 1);
+            } else {
+                prob.put(b, (double) 1);
             }
         }
 
         //probabilidade
-        prob.forEach((k,v) -> {
-            prob.put(k, v/file.length);
-        });
+        prob.forEach((k,v) -> prob.put(k, v/file.length));
 
         double aux = 0;
 
@@ -142,12 +136,11 @@ public class Project {
 
 
         //ordena o map
-        Map<Byte, Double> probOrdenado = prob.entrySet()
+
+        return prob.entrySet()
                 .stream()
                 .sorted(Map.Entry.comparingByValue())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2)-> e1, LinkedHashMap::new));
-
-        return probOrdenado;
     }
 
 }
