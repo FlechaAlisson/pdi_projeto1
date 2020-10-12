@@ -10,7 +10,7 @@ public class Project {
         Project p = new Project();
         FileHandler f = new FileHandler();
 
-        byte[] file = f.readFile("C:\\Users\\afcfl\\IdeaProjects\\projeto1_PDI\\src\\mto_pequena.png");
+        byte[] file = f.readFile("C:\\Users\\afcfl\\IdeaProjects\\projeto1_PDI\\src\\foto.jpg");
 
         Map<Byte,Double> ocorrencia = p.prob(file);
 
@@ -21,11 +21,11 @@ public class Project {
         for (int i = 0; i < file.length; i++) {
             arrayByte.add(file[i]);
         }
-        ArrayList<Integer> saida = p.comprimeFile(arrayByte,ocorrencia);
+        ArrayList<Integer> saida = p.comprimeFile(arrayByte,ocorrencia, true);
         f.writeFile(saida);
         //System.out.println(saida);
         long fim  = System.currentTimeMillis();
-        System.out.println("Tempode execucao: " + (double) ((fim - inicio)) + " milissegundos" );
+        System.out.println("Tempo de execucao: " + (double) ((fim - inicio)) + " milissegundos" );
         //p.decompimeFile(saida,ocorrencia);
 
 
@@ -38,7 +38,8 @@ public class Project {
     }
 
 
-    private ArrayList<Integer> comprimeFile(ArrayList<Byte> arrayByte, Map<Byte, Double> ocorrencia) {
+
+    private ArrayList<Integer> comprimeFile(ArrayList<Byte> arrayByte, Map<Byte, Double> ocorrencia, boolean verbose) {
         int high = 9999;
         int low = 0;
         ArrayList<Integer> saida = new ArrayList<>();
@@ -55,21 +56,23 @@ public class Project {
             double prob_final = myMap.get(b);
 
 
-//            System.out.println("===========================================================");
-//            System.out.println(b);
-//            System.out.println("high: "+ high);
-//            System.out.println("low: "+ low);
-//            System.out.println("prob_inicial: " + prob_inicial);
-//            System.out.println("prob_final: "+ prob_final);
+            if (verbose) {
+                System.out.println("===========================================================");
+                System.out.println(b);
+                System.out.println("high: "+ high);
+                System.out.println("low: "+ low);
+                System.out.println("prob_inicial: " + prob_inicial);
+                System.out.println("prob_final: "+ prob_final);
+            }
             low = (int) (low + (high - low + 1) * prob_inicial);
             high = (int) (low + (high - low + 1) * prob_final - 1);
 
 
 
-//
-//            System.out.println("new_prob_inicial: " + prob_inicial);
-//            System.out.println("new_prob_final: "+ prob_final);
-
+            if (verbose) {
+                System.out.println("new_prob_inicial: " + prob_inicial);
+                System.out.println("new_prob_final: "+ prob_final);
+            }
             int ultimoDigitoHigh = high/1000;
             int ultimoDigitoLow = low/1000;
 
@@ -84,15 +87,19 @@ public class Project {
                 ultimoDigitoHigh = high/1000;
                 ultimoDigitoLow = low/1000;
             }
-//            System.out.println("new_high: "+ high);
-//            System.out.println("new_low: "+ low);
-
+            if (verbose) {
+                System.out.println("new_high: "+ high);
+                System.out.println("new_low: "+ low);
+            }
         }
             while (low % 10 == 0){
                 low/=10;
             }
 
             saida.add(low);
+            if (verbose){
+                System.out.println(low);
+            }
             return saida;
     }
 
