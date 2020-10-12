@@ -1,3 +1,5 @@
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -10,7 +12,7 @@ public class Project {
         Project p = new Project();
         FileHandler f = new FileHandler();
 
-        byte[] file = f.readFile("C:\\Users\\afcfl\\IdeaProjects\\projeto1_PDI\\src\\teste.txt");
+        byte[] file = f.readFile("C:\\Users\\afcfl\\IdeaProjects\\projeto1_PDI\\src\\4k.jpg");
 
         Map<Byte,Double> ocorrencia = p.prob(file);
 
@@ -21,13 +23,28 @@ public class Project {
             arrayByte.add(b);
         }
         ArrayList<Integer> saida = p.comprimeFile(arrayByte,ocorrencia, false);
-        System.out.println(saida);
         System.out.println(saida.size());
-        f.writeFile(saida);
+
+        System.out.println(ocorrencia.size());
+
+        try {
+            f.writeFile(saida, ocorrencia);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         long fim  = System.currentTimeMillis();
         System.out.println("Tempo de execucao: " + (double) ((fim - inicio)) + " milissegundos" );
-        //p.decompimeFile(saida,ocorrencia);
+
+        Object[] aux = new Object[2];
+        try {
+           aux = f.readCompressedFile("saida.art");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+
 
 
     }
