@@ -88,7 +88,6 @@ public class FileHandler {
         returno[0] = ocorrencia;
         returno[1] = saida;
 
-        System.out.println(saida);
 
         return returno;
 

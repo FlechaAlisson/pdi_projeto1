@@ -1,59 +1,29 @@
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Project {
+public class CompressorAritmetico {
 
+    private byte[] file;
 
+    public byte[] getFile() {
+        return file;
+    }
 
-    public static void main(String[] args) {
-        long inicio = System.currentTimeMillis();
-        Project p = new Project();
-        FileHandler f = new FileHandler();
+    public void setFile(byte[] file) {
+        this.file = file;
+    }
 
-        byte[] file = f.readFile("C:\\Users\\afcfl\\IdeaProjects\\projeto1_PDI\\src\\4k.jpg");
+    public CompressorAritmetico(byte[] file) {
+        this.file = file;
+    }
 
-        Map<Byte,Double> ocorrencia = p.prob(file);
-
-
-        //transforma o vetor de bytes em um arraylist
-        ArrayList<Byte> arrayByte = new ArrayList<>();
-        for (byte b : file) {
-            arrayByte.add(b);
-        }
-        ArrayList<Integer> saida = p.comprimeFile(arrayByte,ocorrencia, false);
-        System.out.println(saida.size());
-
-        System.out.println(ocorrencia.size());
-
-        try {
-            f.writeFile(saida, ocorrencia);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        long fim  = System.currentTimeMillis();
-        System.out.println("Tempo de execucao: " + (double) ((fim - inicio)) + " milissegundos" );
-
-        Object[] aux = new Object[2];
-        try {
-           aux = f.readCompressedFile("saida.art");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
-
-
-
+    public void descomprime(Map<Byte, Double> ocorrencia, ArrayList<Integer> saida) {
+        
     }
 
 
-
-
-
-    private ArrayList<Integer> comprimeFile(ArrayList<Byte> arrayByte, Map<Byte, Double> ocorrencia, boolean verbose) {
+    public ArrayList<Integer> comprimeFile(ArrayList<Byte> arrayByte, Map<Byte, Double> ocorrencia, boolean verbose) {
         int high = 9999;
         int low = 0;
         int underflow = 0;
@@ -98,7 +68,7 @@ public class Project {
                     underflow = Math.addExact(underflow, ultimoDigitoHigh);
                 }catch (java.lang.ArithmeticException e){
                     saida.add(underflow);
-                    underflow = 0;
+                    underflow = ultimoDigitoHigh;
                 }
                 ultimoDigitoHigh*= 1000;
                 ultimoDigitoLow*= 1000;
@@ -140,7 +110,7 @@ public class Project {
     }
 
 
-    private Map<Byte, Double> prob(byte[] file) {
+    public Map<Byte, Double> prob(byte[] file) {
         Map<Byte, Double> prob = new HashMap<>();
         for (byte b : file) {
             if (prob.containsKey(b)) {
