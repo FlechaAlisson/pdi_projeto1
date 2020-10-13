@@ -62,6 +62,10 @@ public class CompressorAritmetico {
             int ultimoDigitoLow = low/1000;
 
 
+
+            /**
+             * Testa o Underflow, Caso seja TRUE
+             * */
             while (ultimoDigitoHigh == ultimoDigitoLow || (high - low) < 10){
                 try{
                     underflow = Math.multiplyExact(underflow,10);
@@ -120,13 +124,17 @@ public class CompressorAritmetico {
             }
         }
 
-        //probabilidade
+        /**
+         * Probabilidade
+         * */
         prob.forEach((k,v) -> prob.put(k, v/file.length));
 
         double aux = 0;
 
 
-        //probabilidade acumulada
+        /**
+         * Probabilidade acumulada
+         **/
         for (Map.Entry<Byte,Double> pair : prob.entrySet()
              ) {
             aux+= pair.getValue();
@@ -134,8 +142,9 @@ public class CompressorAritmetico {
         }
 
 
-        //ordena o map
-
+        /**
+         * Ordena o map
+           */
         return prob.entrySet()
                 .stream()
                 .sorted(Map.Entry.comparingByValue())
