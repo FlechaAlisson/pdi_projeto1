@@ -43,9 +43,6 @@ public class CompressorAritmetico {
             i++;
             index = (((code - low) + 1) * 10 - 1) / (high - low + 1);
 
-            System.out.println((double) index/10);
-
-
             double index_aux = ((double) index/10);
             Iterator it = map.keySet().iterator();
             while (it.hasNext() && !((low_freq <= index_aux) && (index_aux < high_freq))){

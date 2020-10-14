@@ -60,7 +60,17 @@ public class Util {
         int n_digitos_proximo;
 
 
+
+        if (arrayList.get(arrayList.size() - 1) == 0) {
+            arrayList.remove(arrayList.size() - 1);
+            int aux = arrayList.get(arrayList.size()-1);
+            arrayList.set(arrayList.size()-1, aux * 10);
+        }
+
+
         for(i = 0; i <= arrayList.size()-1 ; i++){
+
+
 
             n_digitos_atual = 0;
             n_digitos_proximo = 0;
@@ -103,11 +113,6 @@ public class Util {
                 arrayList.set(i, (arrayList.get(i) * 10) + encaixe);
             }
 
-            if (arrayList.get(arrayList.size() - 1) == 0) {
-                int aux = arrayList.get(arrayList.size()-2);
-                arrayList.set(arrayList.size()-2, aux * 10);
-                arrayList.remove(arrayList.size() - 1);
-            }
 
 
         }
