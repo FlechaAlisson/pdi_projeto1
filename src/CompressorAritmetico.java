@@ -1,6 +1,6 @@
-import java.io.IOException;
+
+
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class CompressorAritmetico {
 
@@ -18,8 +18,92 @@ public class CompressorAritmetico {
         this.file = file;
     }
 
-    public void descomprime(Map<Byte, Double> ocorrencia, ArrayList<Integer> saida) {
-        
+
+    /**
+     *Essa função vai retornar um array de byte.
+     */
+
+    public Object[] descomprime(Map<Byte, Double> ocorrencia, ArrayList<Integer> saida) {
+        Util u = new Util();
+        NavigableMap map = u.transformaMapNavigableMap(ocorrencia);
+        ArrayList<Byte> arrayByte = new ArrayList();
+        int high = 9999;
+        int low = 0;
+        int code = u.getCode(saida.get(0));
+        int index;
+        double low_freq = 0;
+        //talvez inicializarele com o last
+        //todo: arrumar o pq na 7 iteracao esta dando errado.
+        double high_freq = (double) map.firstEntry().getValue();
+
+        Byte abyte = (Byte) map.firstEntry().getKey();
+        int i = 0;
+        while (saida.size() != 0){
+            System.out.println("=====================");
+            i++;
+            index = (((code - low) + 1) * 10 - 1) / (high - low + 1);
+
+            System.out.println((double) index/10);
+
+
+            double index_aux = ((double) index/10);
+            Iterator it = map.keySet().iterator();
+            while (it.hasNext() && !((low_freq <= index_aux) && (index_aux < high_freq))){
+                Byte k = (Byte) it.next();
+                abyte = k;
+                try {
+                    low_freq = (double) map.get(map.lowerKey(k));
+                }catch (NullPointerException e){
+                    low_freq = 0;
+                }
+                high_freq = (double) map.get(k);
+
+            }
+
+            arrayByte.add(abyte);
+
+            int low_aux = low;
+            low = (int) (low_aux + ((high - low_aux + 1) * (low_freq * 10)) / 10);
+            high = (int) (low_aux + ((high - low_aux + 1) * (high_freq * 10)) / 10) - 1;
+
+            int ultimoDigitoHigh = high/1000;
+            int ultimoDigitoLow = low/1000;
+
+            if (ultimoDigitoHigh == ultimoDigitoLow || high - low < 10)
+            {
+
+                ultimoDigitoHigh*= 1000;
+                ultimoDigitoLow*= 1000;
+                high = (high - ultimoDigitoHigh) * 10 + 9;
+                low = (low - ultimoDigitoLow) * 10;
+                u.atualizaCode(saida);
+            }
+
+            System.out.println("lowfreq: "+low_freq + "\nhighfreq: " + high_freq);
+            System.out.println("newlow: "+low + "\nnewhigh: " + high);
+
+
+
+
+
+
+//            low = low + (high - low + 1) freq(x) / 10;
+//            high = low + (high - low + 1) freqHigh(x) / 9;
+
+
+
+
+            try {
+                code = u.getCode(saida.get(0));
+            }catch (java.lang.IndexOutOfBoundsException e){}
+
+
+            System.out.println(arrayByte);
+
+        }
+
+
+        return  arrayByte.toArray();
     }
 
 
@@ -27,12 +111,25 @@ public class CompressorAritmetico {
         int high = 9999;
         int low = 0;
         int underflow = 0;
+        Util u = new Util();
         ArrayList<Integer> saida = new ArrayList<>();
-        NavigableMap <Byte, Double> myMap = transformaMapNavigableMap(ocorrencia);
+
+        /**
+        * Transforma o Map em uma NavigableMap, pois precissamos acessar a chave b - 1. Onde 'b'
+         *  é o byte sendo processado atualmente.
+        * */
+        NavigableMap <Byte, Double> myMap = u.transformaMapNavigableMap(ocorrencia);
 
         for (Byte b : arrayByte) {
 
             double prob_inicial;
+
+
+            /**
+             * Tenta acessar a chave anterior a 'b', se causar uma exception de ponteiro para Null,
+             * então atribui 0. Só ocorre caso esteja processando o byte correspondente a primeira chave
+             * do Map.
+             */
             try {
                 prob_inicial = myMap.get(myMap.lowerKey(b));
             }catch (NullPointerException e){
@@ -64,7 +161,12 @@ public class CompressorAritmetico {
 
 
             /**
-             * Testa o Underflow, Caso seja TRUE
+             * Testa o Underflow;
+             * A variavel underflow é inicializada com 0, se for TRUE multiplica o valor de underflow
+             * por 10 e soma o ultimo digito;
+             * Utiliza os métodos da classe Math pra poder fazer a soma e a multiplicação, pois se
+             * causar overflow, uma exception é acionada, fazendo com que o adicione o underflow
+             * na lista e renicializa a variavel underflow com o ultimo digito.
              * */
             while (ultimoDigitoHigh == ultimoDigitoLow || (high - low) < 10){
                 try{
@@ -89,66 +191,18 @@ public class CompressorAritmetico {
                 System.out.println("new_low: "+ low);
             }
         }
-            while (low % 10 == 0){
-                low/=10;
-            }
 
-            if(underflow != 0){
-                saida.add(underflow);
-            }
+            while (low % 10 == 0) low/=10;
+
+            if(underflow != 0) saida.add(underflow);
+
             saida.add(low);
+
             if (verbose) System.out.println(saida);
 
             return saida;
     }
 
-    private NavigableMap<Byte, Double> transformaMapNavigableMap(Map<Byte, Double> ocorrencia) {
-            NavigableMap<Byte, Double> newMap = new TreeMap<>();
 
-        for (Map.Entry<Byte,Double> pair : ocorrencia.entrySet()
-        ) {
-                newMap.put(pair.getKey(),pair.getValue());
-        }
-
-            return newMap;
-    }
-
-
-    public Map<Byte, Double> prob(byte[] file) {
-        Map<Byte, Double> prob = new HashMap<>();
-        for (byte b : file) {
-            if (prob.containsKey(b)) {
-                prob.put(b, prob.get(b) + 1);
-            } else {
-                prob.put(b, (double) 1);
-            }
-        }
-
-        /**
-         * Probabilidade
-         * */
-        prob.forEach((k,v) -> prob.put(k, v/file.length));
-
-        double aux = 0;
-
-
-        /**
-         * Probabilidade acumulada
-         **/
-        for (Map.Entry<Byte,Double> pair : prob.entrySet()
-             ) {
-            aux+= pair.getValue();
-            pair.setValue(aux);
-        }
-
-
-        /**
-         * Ordena o map
-           */
-        return prob.entrySet()
-                .stream()
-                .sorted(Map.Entry.comparingByValue())
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2)-> e1, LinkedHashMap::new));
-    }
 
 }

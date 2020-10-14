@@ -1,6 +1,8 @@
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static java.lang.StrictMath.log;
 import static java.lang.StrictMath.pow;
@@ -8,27 +10,49 @@ import static java.lang.StrictMath.pow;
 public class Main {
 
     public static void main(String[] args) {
-       /* long inicio = System.currentTimeMillis();
+
+
+        long inicio = System.currentTimeMillis();
         FileHandler f = new FileHandler();
 
-        byte[] file = f.readFile("./Fotos/teste.txt");
+        byte[] file = f.readFile(args[0]);
+        boolean verbose = false;
+        if (args.length == 2) verbose = args[1].equals("verbose");
+        Util u = new Util();
+        //ArrayList<Byte> arrayByte = new ArrayList<>();
 
         CompressorAritmetico compressorAritmetico = new CompressorAritmetico(file);
 
-        Map<Byte,Double> ocorrencia = compressorAritmetico.prob(file);
+        Map<Byte,Double> ocorrencia = u.getModeloProb(file);
 
         //transforma o vetor de bytes em um arraylist
-        ArrayList<Byte> arrayByte = new ArrayList<>();
         for (byte b : file) {
-            arrayByte.add(b);
+          //  arrayByte.add(b);
         }
 
 
-        ArrayList<Integer> saida = compressorAritmetico.comprimeFile(arrayByte,ocorrencia, false);
-        System.out.println(saida);
-        System.out.println(arrayByte);
-        System.out.println(ocorrencia);
+        //ArrayList<Integer> saida = compressorAritmetico.comprimeFile(arrayByte,ocorrencia, verbose);
+        ArrayList<Integer> saida = new ArrayList();
+        saida.add(7175);
+        saida.add(33750);
 
+        ocorrencia.clear();
+        ocorrencia.put((byte) 1, (double) 0.1);
+        ocorrencia.put((byte) 2,0.2);
+        ocorrencia.put((byte) 3,0.4);
+        ocorrencia.put((byte) 4,0.5);
+        ocorrencia.put((byte) 5, (double) 1);
+
+        ocorrencia.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByValue())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2)-> e1, LinkedHashMap::new));
+
+
+
+
+        System.out.println(ocorrencia);
+        System.out.println(saida);
         try {
             f.writeFile(saida, ocorrencia);
         } catch (IOException e) {
@@ -48,66 +72,8 @@ public class Main {
         compressorAritmetico.descomprime((Map<Byte, Double>) aux[0],(ArrayList<Integer>)aux[1]);
 
 
-
-
-        */
-
-        Main m = new Main();
-        ArrayList<Integer> i = new ArrayList();
-        i.add(1234);
-        i.add(5678);
-        i.add(321);
-        i.add(543);
-
-        System.out.println(i);
-
-        m.atualizaCode(i);
-        System.out.println(i);
     }
 
-    void atualizaCode(ArrayList<Integer> arrayList){
-        int i, num_decimal_atual, num_decimal_prox, encaixe, primeiro_atual;
-        int n_digitos_atual;
-        int n_digitos_proximo;
-
-
-        for(i = 0; i <= arrayList.size()-1 ; i++){
-
-            n_digitos_atual = 0;
-            n_digitos_proximo = 0;
-            num_decimal_atual = num_decimal_prox = 1;
-
-            //pega o numero de digitos indice atual
-            for(int aux = arrayList.get(i); aux != 0 ; aux/=10, n_digitos_atual++);
-            //pega o numeral decimal
-            while (n_digitos_atual > 1){
-                num_decimal_atual *= 10;
-                n_digitos_atual--;
-            }
-            //pega o primeiro digito atual
-            primeiro_atual = (arrayList.get(i) / num_decimal_atual);
-
-            //modifica o indice atual
-            arrayList.set(i, arrayList.get(i) - num_decimal_atual*primeiro_atual);
-
-            //apenas registra o encaixe caso o indice atual seja menor que o ultimo indice
-            if(i < arrayList.size()-1) {
-
-                //pega o numero de digitos do proximo indice
-                for (int aux = arrayList.get(i + 1); aux != 0; aux /= 10, n_digitos_proximo++) ;
-                while (n_digitos_proximo > 1) {
-                    num_decimal_prox *= 10;
-                    n_digitos_proximo--;
-                }
-                //pega o primeiro do proximo
-                encaixe = (arrayList.get(i + 1) / num_decimal_prox);
-                arrayList.set(i, (arrayList.get(i) * 10) + encaixe);
-            }
-            //System.out.println(arrayList.get(i));
-        }
-
-
-    }
 
 
 }
