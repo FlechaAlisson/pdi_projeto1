@@ -33,7 +33,6 @@ public class CompressorAritmetico {
         int index;
         double low_freq = 0;
         //talvez inicializarele com o last
-        //todo: arrumar o pq na 7 iteracao esta dando errado.
         double high_freq = (double) map.firstEntry().getValue();
 
         Byte abyte = (Byte) map.firstEntry().getKey();
@@ -91,6 +90,7 @@ public class CompressorAritmetico {
 
 
             try {
+                if (((saida.get(0)) < 999) && saida.size() >= 2) saida.remove(0);
                 code = u.getCode(saida.get(0));
             }catch (java.lang.IndexOutOfBoundsException e){}
 
@@ -117,8 +117,10 @@ public class CompressorAritmetico {
         * */
         NavigableMap <Byte, Double> myMap = u.transformaMapNavigableMap(ocorrencia);
 
+        int i = 1;
         for (Byte b : arrayByte) {
 
+            i++;
             double prob_inicial;
 
 
@@ -143,8 +145,9 @@ public class CompressorAritmetico {
                 System.out.println("prob_inicial: " + prob_inicial);
                 System.out.println("prob_final: "+ prob_final);
             }
-            low = (int) (low + (high - low + 1) * prob_inicial);
-            high = (int) (low + (high - low + 1) * prob_final - 1);
+            int old_low = low;
+            low = (int) (old_low + (high - old_low + 1) * prob_inicial);
+            high = (int) (old_low + (high - old_low + 1) * prob_final ) - 1;
 
 
 
@@ -183,13 +186,8 @@ public class CompressorAritmetico {
                 if (verbose) System.out.println("underflow");
 
             }
-            if (verbose) {
-                System.out.println("new_high: "+ high);
-                System.out.println("new_low: "+ low);
-            }
         }
 
-            while (low % 10 == 0) low/=10;
 
             if(underflow != 0) saida.add(underflow);
 

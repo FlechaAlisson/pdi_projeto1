@@ -19,7 +19,7 @@ public class Main {
         boolean verbose = false;
         if (args.length == 2) verbose = args[1].equals("verbose");
         Util u = new Util();
-        //ArrayList<Byte> arrayByte = new ArrayList<>();
+        ArrayList<Byte> arrayByte = new ArrayList<>();
 
         CompressorAritmetico compressorAritmetico = new CompressorAritmetico(file);
 
@@ -27,14 +27,21 @@ public class Main {
 
         //transforma o vetor de bytes em um arraylist
         for (byte b : file) {
-          //  arrayByte.add(b);
+            arrayByte.add(b);
         }
 
+/*        arrayByte.clear();
+        arrayByte.add((byte) 5);
+        arrayByte.add((byte) 4);
+        arrayByte.add((byte) 3);
+        arrayByte.add((byte) 5);
+        arrayByte.add((byte) 5);
+        arrayByte.add((byte) 1);
+        arrayByte.add((byte) 2);
+        arrayByte.add((byte) 3);
+        arrayByte.add((byte) 5);
+        arrayByte.add((byte) 5);
 
-        //ArrayList<Integer> saida = compressorAritmetico.comprimeFile(arrayByte,ocorrencia, verbose);
-        ArrayList<Integer> saida = new ArrayList();
-        saida.add(7175);
-        saida.add(33750);
 
         ocorrencia.clear();
         ocorrencia.put((byte) 1, (double) 0.1);
@@ -51,8 +58,15 @@ public class Main {
 
 
 
+
+*/
+        ArrayList<Integer> saida = compressorAritmetico.comprimeFile(arrayByte,ocorrencia, verbose);
+
+
+
         System.out.println(ocorrencia);
         System.out.println(saida);
+//        System.out.println(arrayByte);
         try {
             f.writeFile(saida, ocorrencia);
         } catch (IOException e) {
@@ -69,7 +83,10 @@ public class Main {
             e.printStackTrace();
         }
 
+
         compressorAritmetico.descomprime((Map<Byte, Double>) aux[0],(ArrayList<Integer>)aux[1]);
+        System.out.println(aux[0]);
+        System.out.println(aux[1]);
 
 
     }

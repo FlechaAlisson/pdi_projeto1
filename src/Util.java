@@ -51,7 +51,17 @@ public class Util {
     }
 
     int getCode(int code){
-        return code%10000;
+        int final_code = 0;
+        for (int i = 0; i < 4 ; i++) {
+            int ultimo_digito = code;
+            int j;
+            for (j = 0; ultimo_digito >= 10; j++, ultimo_digito /= 10);
+            code -= ultimo_digito * Math.pow( 10 , j);
+            final_code = final_code * 10 + ultimo_digito;
+            if ((code < 0)) break;
+        }
+
+    return final_code;
     }
 
     void atualizaCode(ArrayList<Integer> arrayList){
