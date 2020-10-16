@@ -63,18 +63,11 @@ public class Main {
         ArrayList<Integer> saida = compressorAritmetico.comprimeFile(arrayByte,ocorrencia, verbose);
 
 
-
-        System.out.println(ocorrencia);
-        System.out.println(saida);
-//        System.out.println(arrayByte);
         try {
-            f.writeFile(saida, ocorrencia);
+            f.writeFile(saida, ocorrencia,file.length);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        long fim  = System.currentTimeMillis();
-        System.out.println("Tempo de execucao: " + (double) ((fim - inicio)) + " milissegundos" );
 
         Object[] aux = new Object[2];
         try {
@@ -84,9 +77,17 @@ public class Main {
         }
 
 
-        compressorAritmetico.descomprime((Map<Byte, Double>) aux[0],(ArrayList<Integer>)aux[1]);
-        System.out.println(aux[0]);
-        System.out.println(aux[1]);
+        byte[] finalFile = compressorAritmetico.descomprime((Map<Byte, Double>) aux[0],(ArrayList<Integer>)aux[1],verbose,(int) aux[2]);
+
+        f.writeFile("mto_pequena.png",finalFile);
+
+        long fim  = System.currentTimeMillis();
+        System.out.println("Tempo de execucao: " + (double) ((fim - inicio)) + " milissegundos" );
+
+
+        System.out.println(saida);
+        u.procurarErros(file, finalFile);
+
 
 
     }

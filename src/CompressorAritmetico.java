@@ -20,27 +20,28 @@ public class CompressorAritmetico {
 
 
     /**
-     *Essa função vai retornar um array de byte.
+     *
+     * @return Essa função vai retornar um array de byte.
      */
 
-    public Object[] descomprime(Map<Byte, Double> ocorrencia, ArrayList<Integer> saida) {
+    public byte[] descomprime(Map<Byte, Double> map, ArrayList<Integer> saida, boolean verbose, int tam) {
         Util u = new Util();
-        NavigableMap map = u.transformaMapNavigableMap(ocorrencia);
         ArrayList<Byte> arrayByte = new ArrayList();
         int high = 9999;
         int low = 0;
         int code = u.getCode(saida.get(0));
-        int index;
+        double index;
         double low_freq = 0;
-        //talvez inicializarele com o last
-        double high_freq = (double) map.firstEntry().getValue();
 
-        Byte abyte = (Byte) map.firstEntry().getKey();
+        /*talvez inicializarele com o last*/
+        double high_freq = map.entrySet().iterator().next().getValue();
+
+        Byte abyte = map.entrySet().iterator().next().getKey();
         int i = 0;
-        while (saida.size() != 0){
-            System.out.println("=====================");
+        while (i < tam ){
+            if (verbose) System.out.println("=====================");
             i++;
-            index = (((code - low) + 1) * 10 - 1) / (high - low + 1);
+            index = (double)(((code - low) + 1) * 10 - 1) / (high - low + 1);
 
             double index_aux = ((double) index/10);
             Iterator it = map.keySet().iterator();
@@ -48,11 +49,11 @@ public class CompressorAritmetico {
                 Byte k = (Byte) it.next();
                 abyte = k;
                 try {
-                    low_freq = (double) map.get(map.lowerKey(k));
+                    low_freq = map.get(u.getLowerKey(map,k));
                 }catch (NullPointerException e){
                     low_freq = 0;
                 }
-                high_freq = (double) map.get(k);
+                high_freq = map.get(k);
 
             }
 
@@ -65,7 +66,7 @@ public class CompressorAritmetico {
             int ultimoDigitoHigh = high/1000;
             int ultimoDigitoLow = low/1000;
 
-            if (ultimoDigitoHigh == ultimoDigitoLow || high - low < 10)
+            while (ultimoDigitoHigh == ultimoDigitoLow || high - low < 10)
             {
 
                 ultimoDigitoHigh*= 1000;
@@ -73,21 +74,16 @@ public class CompressorAritmetico {
                 high = (high - ultimoDigitoHigh) * 10 + 9;
                 low = (low - ultimoDigitoLow) * 10;
                 u.atualizaCode(saida);
+
+                ultimoDigitoHigh = high/1000;
+                ultimoDigitoLow = low/1000;
+
             }
+            if (verbose) {
 
-            System.out.println("lowfreq: "+low_freq + "\nhighfreq: " + high_freq);
-            System.out.println("newlow: "+low + "\nnewhigh: " + high);
-
-
-
-
-
-
-//            low = low + (high - low + 1) freq(x) / 10;
-//            high = low + (high - low + 1) freqHigh(x) / 9;
-
-
-
+                System.out.println("lowfreq: " + low_freq + "\nhighfreq: " + high_freq);
+                System.out.println("newlow: " + low + "\nnewhigh: " + high);
+            }
 
             try {
                 if (((saida.get(0)) < 999) && saida.size() >= 2) saida.remove(0);
@@ -95,27 +91,26 @@ public class CompressorAritmetico {
             }catch (java.lang.IndexOutOfBoundsException e){}
 
 
-            System.out.println(arrayByte);
 
         }
 
+        Object[] objects = arrayByte.toArray();
+        byte[] final_array = new byte[objects.length];
+        for (int j = 0; j < objects.length ; j++) {
+            final_array[j] = (byte) objects[j];
+        }
 
-        return  arrayByte.toArray();
+
+        return  final_array;
     }
 
 
-    public ArrayList<Integer> comprimeFile(ArrayList<Byte> arrayByte, Map<Byte, Double> ocorrencia, boolean verbose) {
+    public ArrayList<Integer> comprimeFile(ArrayList<Byte> arrayByte, Map<Byte, Double> map, boolean verbose) {
         int high = 9999;
         int low = 0;
         int underflow = 0;
         Util u = new Util();
         ArrayList<Integer> saida = new ArrayList<>();
-
-        /**
-        * Transforma o Map em uma NavigableMap, pois precissamos acessar a chave b - 1. Onde 'b'
-         *  é o byte sendo processado atualmente.
-        * */
-        NavigableMap <Byte, Double> myMap = u.transformaMapNavigableMap(ocorrencia);
 
         int i = 1;
         for (Byte b : arrayByte) {
@@ -130,11 +125,11 @@ public class CompressorAritmetico {
              * do Map.
              */
             try {
-                prob_inicial = myMap.get(myMap.lowerKey(b));
+                prob_inicial = map.get(u.getLowerKey(map,b));
             }catch (NullPointerException e){
                 prob_inicial = 0;
             }
-            double prob_final = myMap.get(b);
+            double prob_final = map.get(b);
 
 
             if (verbose) {

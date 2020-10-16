@@ -1,3 +1,4 @@
+import java.security.Key;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -10,9 +11,25 @@ public class Util {
             newMap.put(pair.getKey(),pair.getValue());
         }
 
-        return newMap;
+
+        return (newMap);
     }
 
+
+    public Byte getLowerKey(Map map, Byte key){
+        /**É suposto pegar a primeira key
+         * */
+        Byte lowerKey = (Byte) map.keySet().iterator().next();
+        if (lowerKey == key) return null;
+        Iterator it = map.keySet().iterator();
+        while (it.hasNext()){
+            Byte k = (Byte) it.next();
+            if (k == key) break;
+
+            lowerKey = k;
+        }
+        return lowerKey;
+    }
     public Map<Byte, Double> getModeloProb(byte[] file) {
         Map<Byte, Double> prob = new HashMap<>();
         for (byte b : file) {
@@ -37,6 +54,7 @@ public class Util {
         for (Map.Entry<Byte,Double> pair : prob.entrySet()
         ) {
             aux+= pair.getValue();
+            if (aux >= 1) aux = 1;
             pair.setValue(aux);
         }
 
@@ -129,6 +147,21 @@ public class Util {
 
 
     }
+
+    void procurarErros(byte[] fileAntigo, byte[] fileNovo)
+    {
+        int erros_total = 0;
+        for (int i = 0; i < fileAntigo.length; i++) {
+            if (fileAntigo[i] != fileNovo[i]) {
+                System.out.println("Erro no byte: " + fileNovo[i] +
+                        "\nDevia Ser: " + fileAntigo[i] +
+                        "\nPosicao: " + i);
+                erros_total++;
+            }
+        }
+        System.out.println("TOTAL DE ERROS: " + erros_total);
+    }
+
 
 
 }

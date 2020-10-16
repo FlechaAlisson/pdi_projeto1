@@ -1,10 +1,8 @@
 import java.io.*;
 
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class FileHandler {
 
@@ -29,7 +27,7 @@ public class FileHandler {
     }
 
 
-    public void writeFile(ArrayList<Integer> saida, Map<Byte, Double> ocorrencia) throws IOException {
+    public void writeFile(ArrayList<Integer> saida, Map<Byte, Double> ocorrencia, int tam) throws IOException {
 
         FileOutputStream f = null;
         try {
@@ -57,11 +55,12 @@ public class FileHandler {
         ) {
             dout.writeInt(i);
         }
+        dout.writeInt(tam);
     }
 
 
     public Object[] readCompressedFile(String path) throws IOException {
-        Object[] returno = new Object[2];
+        Object[] returno = new Object[3];
 
         Map<Byte, Double> ocorrencia = new HashMap<>();
         ArrayList<Integer> saida = new ArrayList();
@@ -85,11 +84,36 @@ public class FileHandler {
             saida.add(in.readInt());
         }
 
+        returno[2] = in.readInt();
+
+        ocorrencia.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByValue())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2)-> e1, LinkedHashMap::new));
+
         returno[0] = ocorrencia;
         returno[1] = saida;
 
 
         return returno;
 
+    }
+
+    public void writeFile(String path, byte[] file){
+        FileOutputStream f = null;
+        try {
+            f = new FileOutputStream(new File(path));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+
+        DataOutputStream dout = new DataOutputStream(f);
+
+        try {
+            dout.write(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
