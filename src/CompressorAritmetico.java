@@ -38,7 +38,7 @@ public class CompressorAritmetico {
 
         Byte abyte = map.entrySet().iterator().next().getKey();
         int i = 0;
-        while (i < tam ){
+        while (i < tam  && code != 0){
             if (verbose) System.out.println("=====================");
             i++;
             index = (double)(((code - low) + 1) * 10 - 1) / (high - low + 1);
@@ -66,6 +66,8 @@ public class CompressorAritmetico {
             int ultimoDigitoHigh = high/1000;
             int ultimoDigitoLow = low/1000;
 
+
+
             while (ultimoDigitoHigh == ultimoDigitoLow || high - low < 10)
             {
 
@@ -73,8 +75,8 @@ public class CompressorAritmetico {
                 ultimoDigitoLow*= 1000;
                 high = (high - ultimoDigitoHigh) * 10 + 9;
                 low = (low - ultimoDigitoLow) * 10;
-                u.atualizaCode(saida);
 
+                u.atualizaCode(saida);
                 ultimoDigitoHigh = high/1000;
                 ultimoDigitoLow = low/1000;
 

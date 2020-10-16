@@ -89,10 +89,17 @@ public class Util {
 
 
 
+
         if (arrayList.get(arrayList.size() - 1) == 0) {
-            arrayList.remove(arrayList.size() - 1);
-            int aux = arrayList.get(arrayList.size()-1);
-            arrayList.set(arrayList.size()-1, aux * 10);
+            try {
+                arrayList.remove(arrayList.size() - 1);
+                if (arrayList.size() == 0) return;
+                int aux = arrayList.get(arrayList.size()-1);
+                arrayList.set(arrayList.size()-1, aux * 10);
+
+            }catch (IndexOutOfBoundsException e){
+                System.out.println(arrayList);
+            }
         }
 
 

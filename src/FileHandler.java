@@ -69,7 +69,7 @@ public class FileHandler {
         DataInputStream in = new DataInputStream(new FileInputStream(path));
 
 
-            size = in.readInt();
+        size = in.readInt();
 
         for (int i = 0; i < size; i++) {
             Byte key = in.readByte();
