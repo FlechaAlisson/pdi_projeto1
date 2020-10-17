@@ -24,28 +24,35 @@ public class CompressorAritmetico {
      * @return Essa função vai retornar um array de byte.
      */
 
-    public byte[] descomprime(Map<Byte, Double> map, ArrayList<Integer> saida, boolean verbose, int tam) {
+    public byte[] descomprime(Map<Byte, Double> map, ArrayList<Integer> fileCompressed, boolean verbose, int tam) {
         Util u = new Util();
         ArrayList<Byte> arrayByte = new ArrayList();
         int high = 9999;
         int low = 0;
-        int code = u.getCode(saida.get(0));
+        int code = u.getCode(fileCompressed.get(0));
         double index;
         double low_freq = 0;
 
-        /*talvez inicializarele com o last*/
+        /**Pega o primeira frequencia do map
+         * */
         double high_freq = map.entrySet().iterator().next().getValue();
 
+        /**Pega o primeiro byte do Map
+         * **/
         Byte abyte = map.entrySet().iterator().next().getKey();
         int i = 0;
-        while (i < tam  && code != 0){
+        while (i < tam){
             if (verbose) System.out.println("=====================");
             i++;
             index = (double)(((code - low) + 1) * 10 - 1) / (high - low + 1);
 
-            double index_aux = ((double) index/10);
+
+            /**
+             * Começa a varrer o Map em busca de algum dos intervalos onde o index
+             * esteja dentro
+             * */
             Iterator it = map.keySet().iterator();
-            while (it.hasNext() && !((low_freq <= index_aux) && (index_aux < high_freq))){
+            while (it.hasNext() && !((low_freq <= (index/10)) && ((index/10) < high_freq))){
                 Byte k = (Byte) it.next();
                 abyte = k;
                 try {
@@ -57,6 +64,9 @@ public class CompressorAritmetico {
 
             }
 
+            /**
+             * Adiciona o byte no vetor de saida
+             * */
             arrayByte.add(abyte);
 
             int low_aux = low;
@@ -68,6 +78,12 @@ public class CompressorAritmetico {
 
 
 
+
+            /**
+             * Testa o underflow,
+             * Se tiver, atualiza o High, o Low
+             * e o Code
+             * **/
             while (ultimoDigitoHigh == ultimoDigitoLow || high - low < 10)
             {
 
@@ -76,7 +92,8 @@ public class CompressorAritmetico {
                 high = (high - ultimoDigitoHigh) * 10 + 9;
                 low = (low - ultimoDigitoLow) * 10;
 
-                u.atualizaCode(saida);
+                u.atualizaCode(fileCompressed);
+
                 ultimoDigitoHigh = high/1000;
                 ultimoDigitoLow = low/1000;
 
@@ -88,13 +105,20 @@ public class CompressorAritmetico {
             }
 
             try {
-                if (((saida.get(0)) < 999) && saida.size() >= 2) saida.remove(0);
-                code = u.getCode(saida.get(0));
+                code = u.getCode(fileCompressed.get(0));
+                System.out.println("----");
+                System.out.println(fileCompressed);
+
             }catch (java.lang.IndexOutOfBoundsException e){}
 
 
 
         }
+
+
+        /***
+         * Transforma o Arraylist em vetor.
+         */
 
         Object[] objects = arrayByte.toArray();
         byte[] final_array = new byte[objects.length];
@@ -165,7 +189,7 @@ public class CompressorAritmetico {
              * causar overflow, uma exception é acionada, fazendo com que o adicione o underflow
              * na lista e renicializa a variavel underflow com o ultimo digito.
              * */
-            while (ultimoDigitoHigh == ultimoDigitoLow || (high - low) < 10){
+            while (((ultimoDigitoHigh == ultimoDigitoLow )|| (high - low) < 10)){
                 try{
                     underflow = Math.multiplyExact(underflow,10);
                     underflow = Math.addExact(underflow, ultimoDigitoHigh);
