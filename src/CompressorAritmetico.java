@@ -21,10 +21,10 @@ public class CompressorAritmetico {
 
     /**
      *
-     * @return Essa função vai retornar um array de byte.
+     * Essa função vai retornar um array de byte.
      */
 
-    public byte[] descomprime(Map<Byte, Double> map, ArrayList<Integer> fileCompressed, boolean verbose, int tam) {
+    public byte[] descomprime(Map<Byte, Double> map, ArrayList<String> fileCompressed, boolean verbose, int tam) {
         Util u = new Util();
         ArrayList<Byte> arrayByte = new ArrayList();
         int high = 9999;
@@ -41,7 +41,7 @@ public class CompressorAritmetico {
          * **/
         Byte abyte = map.entrySet().iterator().next().getKey();
         int i = 0;
-        while (i < tam){
+        while (arrayByte.size() < tam){
             if (verbose) System.out.println("=====================");
             i++;
             index = (double)(((code - low) + 1) * 10 - 1) / (high - low + 1);
@@ -76,12 +76,9 @@ public class CompressorAritmetico {
             int ultimoDigitoHigh = high/1000;
             int ultimoDigitoLow = low/1000;
 
-
-
-
             /**
              * Testa o underflow,
-             * Se tiver, atualiza o High, o Low
+             * Se tiver ocorrido o underflow, atualiza o High, o Low
              * e o Code
              * **/
             while (ultimoDigitoHigh == ultimoDigitoLow || high - low < 10)
@@ -92,7 +89,7 @@ public class CompressorAritmetico {
                 high = (high - ultimoDigitoHigh) * 10 + 9;
                 low = (low - ultimoDigitoLow) * 10;
 
-                u.atualizaCode(fileCompressed);
+//                u.atualizaCode(fileCompressed);
 
                 ultimoDigitoHigh = high/1000;
                 ultimoDigitoLow = low/1000;

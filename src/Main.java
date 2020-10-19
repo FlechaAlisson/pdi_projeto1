@@ -1,11 +1,7 @@
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-import static java.lang.StrictMath.log;
-import static java.lang.StrictMath.pow;
 
 public class Main {
 
@@ -77,16 +73,27 @@ public class Main {
         }
 
 
-        byte[] finalFile = compressorAritmetico.descomprime((Map<Byte, Double>) aux[0],(ArrayList<Integer>)aux[1],verbose,(int) aux[2]);
+        ArrayList<String> arrayListString = new ArrayList();
+        ArrayList<Integer> arrayListInteger = (ArrayList<Integer>) aux[1];
 
-        f.writeFile("mto_pequena.png",finalFile);
+
+        for (Integer i :
+                arrayListInteger) {
+            arrayListString.add(i.toString());
+
+        }
+        //byte[] finalFile = compressorAritmetico.descomprime((Map<Byte, Double>) aux[0],arrayListString,verbose,(int) aux[2]);
+
+        /*f.writeFile("teste.txt",finalFile);
 
         long fim  = System.currentTimeMillis();
         System.out.println("Tempo de execucao: " + (double) ((fim - inicio)) + " milissegundos" );
+*/
 
 
+        System.out.println(u.getCode(arrayListString.get(0)));
         System.out.println(saida);
-        u.procurarErros(file, finalFile);
+        //u.procurarErros(file, finalFile);
 
 
 

@@ -1,21 +1,7 @@
-import java.security.Key;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class Util {
-    public NavigableMap<Byte, Double> transformaMapNavigableMap(Map<Byte, Double> ocorrencia) {
-        NavigableMap<Byte, Double> newMap = new TreeMap<>();
-
-        for (Map.Entry<Byte,Double> pair : ocorrencia.entrySet()
-        ) {
-            newMap.put(pair.getKey(),pair.getValue());
-        }
-
-
-        return (newMap);
-    }
-
-
     public Byte getLowerKey(Map map, Byte key){
         /**É suposto pegar a primeira key
          * */
@@ -68,18 +54,28 @@ public class Util {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2)-> e1, LinkedHashMap::new));
     }
 
-    int getCode(int code){
-        int final_code = 0;
-        for (int i = 0; i < 4 ; i++) {
-            int ultimo_digito = code;
-            int j;
-            for (j = 0; ultimo_digito >= 10; j++, ultimo_digito /= 10);
-            code -= ultimo_digito * Math.pow( 10 , j);
-            final_code = final_code * 10 + ultimo_digito;
-            if ((code < 0)) break;
+    int getCode(String code){
+
+        /**
+         * Função para pegar os 4 primeiros digito do code
+         * */
+        String value = null;
+
+        switch (code.length()){
+            case 1 :
+                value = code.substring(0,1);
+                break;
+            case 2 :
+                value = code.substring(0,2);
+                break;
+            case 3 :
+                value = code.substring(0,3);
+                break;
+            default: value = code.substring(0,4);
+
         }
 
-    return final_code;
+    return Integer.valueOf(value);
     }
 
     void atualizaCode(ArrayList<Integer> arrayList){
@@ -92,13 +88,20 @@ public class Util {
 
         if (arrayList.get(arrayList.size() - 1) == 0) {
             try {
+                /**
+                 * Remove o ultimo elemento, pois ele é 0
+                 * testa se é o único elemento.
+                 **/
                 arrayList.remove(arrayList.size() - 1);
                 if (arrayList.size() == 0) return;
+                /**
+                 * Se não for, pega o penultimo elemento e o multiplica por 10,
+                 * isso serve pra "levar" o zero pro proximo elemento
+                 **/
                 int aux = arrayList.get(arrayList.size()-1);
                 arrayList.set(arrayList.size()-1, aux * 10);
 
             }catch (IndexOutOfBoundsException e){
-                System.out.println(arrayList);
             }
         }
 
