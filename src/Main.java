@@ -91,8 +91,20 @@ public class Main {
 */
 
 
-        System.out.println(u.getCode(arrayListString.get(0)));
-        System.out.println(saida);
+        arrayListString.clear();
+        arrayListString.add("123");
+        arrayListString.add("456");
+        arrayListString.add("789");
+        arrayListString.add("100");
+        System.out.print("antes: ");
+        System.out.println(arrayListString);
+        int i = 0;
+        while(!arrayListString.isEmpty()) {
+            i++;
+            u.atualizaCode(arrayListString);
+        }
+        System.out.print("depois: ");
+            System.out.println(arrayListString);
         //u.procurarErros(file, finalFile);
 
 
