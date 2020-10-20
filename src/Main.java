@@ -56,56 +56,46 @@ public class Main {
 
 
 */
-        ArrayList<Integer> saida = compressorAritmetico.comprimeFile(arrayByte,ocorrencia, verbose);
+        ArrayList<String> saida = compressorAritmetico.comprimeFile(arrayByte,ocorrencia, verbose);
 
+        System.out.println("comprensão finalizada");
 
-        try {
+        long fim  = System.currentTimeMillis();
+        System.out.println("Tempo de execucao: " + (double) ((fim - inicio)) + " milissegundos" );
+
+        /*try {
             f.writeFile(saida, ocorrencia,file.length);
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
-        Object[] aux = new Object[2];
+        /*Object[] aux = new Object[2];
         try {
             aux = f.readCompressedFile("saida.art");
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
 
-        ArrayList<String> arrayListString = new ArrayList();
-        ArrayList<Integer> arrayListInteger = (ArrayList<Integer>) aux[1];
+       /*ArrayList<String> arrayListString = new ArrayList();
+        ArrayList<Integer> arrayListInteger = (ArrayList<Integer>) aux[1];*/
 
 
-        for (Integer i :
+        /*for (Integer i :
                 arrayListInteger) {
             arrayListString.add(i.toString());
 
-        }
-        //byte[] finalFile = compressorAritmetico.descomprime((Map<Byte, Double>) aux[0],arrayListString,verbose,(int) aux[2]);
+        }*/
 
-        /*f.writeFile("teste.txt",finalFile);
+        System.out.println(saida);
+        byte[] finalFile = compressorAritmetico.descomprime( ocorrencia,saida   ,verbose, file.length);
 
-        long fim  = System.currentTimeMillis();
+        f.writeFile("teste.png",finalFile);
+
+        fim  = System.currentTimeMillis();
         System.out.println("Tempo de execucao: " + (double) ((fim - inicio)) + " milissegundos" );
-*/
 
-
-        arrayListString.clear();
-        arrayListString.add("123");
-        arrayListString.add("456");
-        arrayListString.add("789");
-        arrayListString.add("100");
-        System.out.print("antes: ");
-        System.out.println(arrayListString);
-        int i = 0;
-        while(!arrayListString.isEmpty()) {
-            i++;
-            u.atualizaCode(arrayListString);
-        }
-        System.out.print("depois: ");
-            System.out.println(arrayListString);
-        //u.procurarErros(file, finalFile);
+        u.procurarErros(file, finalFile);
 
 
 

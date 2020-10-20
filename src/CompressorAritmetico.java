@@ -66,7 +66,7 @@ public class CompressorAritmetico {
 
             /**
              * Adiciona o byte no vetor de saida
-             * */
+             **/
             arrayByte.add(abyte);
 
             int low_aux = low;
@@ -84,12 +84,14 @@ public class CompressorAritmetico {
             while (ultimoDigitoHigh == ultimoDigitoLow || high - low < 10)
             {
 
+                System.out.println(i);
                 ultimoDigitoHigh*= 1000;
                 ultimoDigitoLow*= 1000;
                 high = (high - ultimoDigitoHigh) * 10 + 9;
                 low = (low - ultimoDigitoLow) * 10;
 
-//                u.atualizaCode(fileCompressed);
+                u.atualizaCode(fileCompressed);
+                System.out.println(fileCompressed);
 
                 ultimoDigitoHigh = high/1000;
                 ultimoDigitoLow = low/1000;
@@ -103,8 +105,7 @@ public class CompressorAritmetico {
 
             try {
                 code = u.getCode(fileCompressed.get(0));
-                System.out.println("----");
-                System.out.println(fileCompressed);
+
 
             }catch (java.lang.IndexOutOfBoundsException e){}
 
@@ -128,12 +129,12 @@ public class CompressorAritmetico {
     }
 
 
-    public ArrayList<Integer> comprimeFile(ArrayList<Byte> arrayByte, Map<Byte, Double> map, boolean verbose) {
+    public ArrayList<String> comprimeFile(ArrayList<Byte> arrayByte, Map<Byte, Double> map, boolean verbose) {
         int high = 9999;
         int low = 0;
-        int underflow = 0;
+        String underflow = "";
         Util u = new Util();
-        ArrayList<Integer> saida = new ArrayList<>();
+        ArrayList<String> saida = new ArrayList<>();
 
         int i = 1;
         for (Byte b : arrayByte) {
@@ -187,13 +188,20 @@ public class CompressorAritmetico {
              * na lista e renicializa a variavel underflow com o ultimo digito.
              * */
             while (((ultimoDigitoHigh == ultimoDigitoLow )|| (high - low) < 10)){
-                try{
-                    underflow = Math.multiplyExact(underflow,10);
-                    underflow = Math.addExact(underflow, ultimoDigitoHigh);
-                }catch (java.lang.ArithmeticException e){
+
+                underflow = underflow.concat(String.valueOf(ultimoDigitoHigh));
+
+                /**
+                 * Testa se o tamanho da String ainda está
+                 * dentro do valor possível. Caso não esteja,
+                 * guarda na saída e limpa o underflow.
+                 * */
+                if (underflow.length() == Integer.MAX_VALUE) {
                     saida.add(underflow);
-                    underflow = ultimoDigitoHigh;
+                    saida.clear();
                 }
+
+
                 ultimoDigitoHigh*= 1000;
                 ultimoDigitoLow*= 1000;
                 high = (high - ultimoDigitoHigh) * 10 + 9;
@@ -207,9 +215,9 @@ public class CompressorAritmetico {
         }
 
 
-            if(underflow != 0) saida.add(underflow);
+            if(!underflow.isBlank()) saida.add(underflow);
 
-            saida.add(low);
+            saida.add(String.valueOf(low));
 
             if (verbose) System.out.println(saida);
 

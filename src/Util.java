@@ -80,7 +80,6 @@ public class Util {
 
     void atualizaCode(ArrayList<String> arrayList){
 
-        System.out.println(arrayList);
         if (arrayList.size() >= 2){
             for (int i = 0; i < arrayList.size() - 1; i++) {
 
