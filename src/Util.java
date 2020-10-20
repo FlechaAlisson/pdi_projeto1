@@ -80,26 +80,22 @@ public class Util {
 
     void atualizaCode(ArrayList<String> arrayList){
 
-
+        System.out.println(arrayList);
         if (arrayList.size() >= 2){
             for (int i = 0; i < arrayList.size() - 1; i++) {
-                System.out.println(arrayList);
+
                 String digito_sem_primeiro = arrayList.get(i).substring(1);
-
-
                 String primeiro_digito_prox = null;
-                if (arrayList.get(i + 1).length() != 0) primeiro_digito_prox = arrayList.get(i + 1).substring(0, 1);
-                else primeiro_digito_prox = arrayList.get(i + 1);
 
+                primeiro_digito_prox = arrayList.get(i + 1).charAt(0) + "";
                 arrayList.set(i, digito_sem_primeiro.concat(primeiro_digito_prox));
 
 
-                try{
+                if((i + 1) == arrayList.size()-1) {
                     String prox_digito_sem_primeiro = arrayList.get(i + 1).substring(1);
                     arrayList.set(i + 1, prox_digito_sem_primeiro);
-
-                }catch (StringIndexOutOfBoundsException e){
-                    arrayList.remove(arrayList.size()-1);
+                    if(arrayList.get(i + 1).isEmpty())
+                        arrayList.remove(arrayList.size() - 1);
                 }
             }
 
