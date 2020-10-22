@@ -1,3 +1,5 @@
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -23,8 +25,13 @@ public class Util {
         }
         return lowerKey;
     }
+
+
+
     public Map<Byte, Double> getModeloProb(byte[] file) {
         Map<Byte, Double> prob = new HashMap<>();
+
+
         for (byte b : file) {
             if (prob.containsKey(b)) {
                 prob.put(b, prob.get(b) + 1);
@@ -38,17 +45,18 @@ public class Util {
         */
         prob.forEach((k,v) -> prob.put(k, v/file.length));
 
-        double aux = 0;
+        BigDecimal aux = new BigDecimal(0).setScale(5, RoundingMode.HALF_EVEN);
 
 
         /**
          * Probabilidade acumulada
-        */
+         */
         for (Map.Entry<Byte,Double> pair : prob.entrySet()
         ) {
-            aux+= pair.getValue();
-            if (aux >= 1) aux = 1;
-            pair.setValue(aux);
+            BigDecimal value = new BigDecimal(pair.getValue()).setScale(5, RoundingMode.HALF_EVEN);
+            aux = aux.add(value);
+            if (aux.doubleValue() > 1) aux = BigDecimal.valueOf(1);
+            pair.setValue(aux.doubleValue());
         }
 
 

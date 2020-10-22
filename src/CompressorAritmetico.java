@@ -130,6 +130,7 @@ public class CompressorAritmetico {
                 u.atualizaCode(fileCompressed);
                 ultimoDigitoHigh = high / 1000;
                 ultimoDigitoLow = low / 1000;
+                System.out.print("underflow | ");
 
             }
             if (verbose) {
@@ -138,12 +139,9 @@ public class CompressorAritmetico {
                 System.out.println("newlow: " + low + "\nnewhigh: " + high);
             }
 
-            try {
-                code = u.getCode(fileCompressed.get(0));
+            code = u.getCode(fileCompressed.get(0));
+            System.out.println("i:" + i +" | " + fileCompressed);
 
-
-            } catch (java.lang.IndexOutOfBoundsException e) {
-            }
 
 
         }
