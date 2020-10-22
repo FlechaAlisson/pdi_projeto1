@@ -3,14 +3,19 @@
 import java.util.*;
 
 public class CompressorAritmetico {
-
     private byte[] file;
 
+    public byte[] getFile() {
+        return file;
+    }
+
+    public void setFile(byte[] file) {
+        this.file = file;
+    }
 
     public CompressorAritmetico(byte[] file) {
         this.file = file;
     }
-
 
     /**
      * Essa função vai retornar um array de byte.
@@ -72,18 +77,57 @@ public class CompressorAritmetico {
              * Testa o underflow,
              * Se tiver ocorrido o underflow, atualiza o High, o Low
              * e o Code
-             * **/
-            while (ultimoDigitoHigh == ultimoDigitoLow || high - low < 10) {
+             **/
 
-                System.out.println(i);
+
+            if (ultimoDigitoHigh - ultimoDigitoLow == 1) {
+
+                String high_string = String.valueOf(high);
+                String low_string = String.valueOf(low);
+
+                if (high_string.length() < 3){
+                    for (int j = 0; j < 3 ; j++) {
+                        high_string = "0" + high_string;
+                    }
+                }
+                if (low_string.length() < 4){
+                    for (int j = 0; j < 3 ; j++) {
+                        low_string = "0" + low_string;
+                    }
+                }
+                int segundoDigitoHigh = Integer.parseInt((String.valueOf(high_string.charAt(1))));
+                int segundoDigitoLow = Integer.parseInt((String.valueOf(low_string.charAt(1))));
+
+                /**
+                 * Testa se o valor do segundo digito é 0 e 9, pois dai se enquadra
+                 * como o segundo caso de underflow
+                 **/
+
+                if (segundoDigitoHigh == 0 && segundoDigitoLow == 9){
+                    /**
+                     * Cria uma nova string onde retira-se o segundo digito.
+                     **/
+                    String newHigh = String.valueOf(high).substring(0,1) + String.valueOf(high).substring(2) + "9";
+                    String newLow = String.valueOf(low).substring(0,1) + String.valueOf(low).substring(2) + "0";
+                    /**
+                     * transforma a nova string em integer,
+                     * e o atribui o high e o low.
+                     **/
+                    high = Integer.parseInt(newHigh);
+                    low = Integer.parseInt(newLow);
+
+                }
+
+
+            }
+
+            while (ultimoDigitoHigh == ultimoDigitoLow) {
                 ultimoDigitoHigh *= 1000;
                 ultimoDigitoLow *= 1000;
                 high = (high - ultimoDigitoHigh) * 10 + 9;
                 low = (low - ultimoDigitoLow) * 10;
 
                 u.atualizaCode(fileCompressed);
-                System.out.println(fileCompressed);
-
                 ultimoDigitoHigh = high / 1000;
                 ultimoDigitoLow = low / 1000;
 
@@ -160,26 +204,21 @@ public class CompressorAritmetico {
                 System.out.println("prob_final: " + prob_final);
             }
             int old_low = low;
-            low = (int) (old_low + (high - old_low + 1) * prob_inicial);
+            low = (int)(old_low + (high - old_low + 1) * prob_inicial);
             high = (int) (old_low + (high - old_low + 1) * prob_final) - 1;
 
-
-            if (verbose) {
-                System.out.println("new_prob_inicial: " + prob_inicial);
-                System.out.println("new_prob_final: " + prob_final);
+            if (verbose){
+                System.out.println("new_low: " + low);
+                System.out.println("new_high: " + high);
             }
+
             int ultimoDigitoHigh = high / 1000;
             int ultimoDigitoLow = low / 1000;
 
 
             /**
-             * Testa o Underflow;
-             * A variavel underflow é inicializada com 0, se for TRUE multiplica o valor de underflow
-             * por 10 e soma o ultimo digito;
-             * Utiliza os métodos da classe Math pra poder fazer a soma e a multiplicação, pois se
-             * causar overflow, uma exception é acionada, fazendo com que o adicione o underflow
-             * na lista e renicializa a variavel underflow com o ultimo digito.
-             * */
+             * TODO: documentar melhor aqui
+             **/
 
 
             if (ultimoDigitoHigh - ultimoDigitoLow == 1) {
@@ -193,7 +232,6 @@ public class CompressorAritmetico {
                     }
                 }
 
-                System.out.println(low_string.length());
                 if (low_string.length() < 4){
                     for (int j = 0; j < 3 ; j++) {
                         low_string = "0" + low_string;
@@ -232,8 +270,6 @@ public class CompressorAritmetico {
 
 
             }
-
-
             /**
              * Caso os valores sejam menor do que 1000
              * isso faz com que alguns deem erro
@@ -280,14 +316,21 @@ public class CompressorAritmetico {
                         }
                     }
                 }
+
+                if (verbose) {
+                    System.out.println("------------");
+                    System.out.println("underflow: "+ underflow);
+                }
                 ultimoDigitoHigh *= 1000;
                 ultimoDigitoLow *= 1000;
+
                 high = (high - ultimoDigitoHigh) * 10 + 9;
                 low = (low - ultimoDigitoLow) * 10;
 
+                if (verbose) System.out.println("\tnew_high: " + high + "\n\tnew_low: "+low);
+
                 ultimoDigitoHigh = high / 1000;
                 ultimoDigitoLow = low / 1000;
-                if (verbose) System.out.println("underflow");
             }
         }
 

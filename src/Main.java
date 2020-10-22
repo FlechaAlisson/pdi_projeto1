@@ -90,7 +90,7 @@ public class Main {
         System.out.println(saida);
         byte[] finalFile = compressorAritmetico.descomprime( ocorrencia,saida   ,verbose, file.length);
 
-        f.writeFile("teste.png",finalFile);
+        f.writeFile("teste.txt",finalFile);
 
         fim  = System.currentTimeMillis();
         System.out.println("Tempo de execucao: " + (double) ((fim - inicio)) + " milissegundos" );
