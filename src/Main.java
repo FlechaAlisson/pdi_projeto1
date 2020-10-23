@@ -56,7 +56,7 @@ public class Main {
 
 
 */
-        ArrayList<String> saida = compressorAritmetico.comprimeFile(arrayByte,ocorrencia, verbose);
+        ArrayList<Integer> saida = compressorAritmetico.comprimeFile(arrayByte,ocorrencia, verbose);
 
         System.out.println("comprensão finalizada");
 
@@ -88,7 +88,7 @@ public class Main {
         }*/
 
         System.out.println(saida);
-        byte[] finalFile = compressorAritmetico.descomprime( ocorrencia,saida   ,verbose, file.length);
+        byte[] finalFile = compressorAritmetico.descomprime( ocorrencia,saida, verbose, file.length);
 
         f.writeFile("teste.txt",finalFile);
 

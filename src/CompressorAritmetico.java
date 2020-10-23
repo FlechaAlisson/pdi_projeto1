@@ -21,12 +21,12 @@ public class CompressorAritmetico {
      * Essa função vai retornar um array de byte.
      */
 
-    public byte[] descomprime(Map<Byte, Double> map, ArrayList<String> fileCompressed, boolean verbose, int tam) {
+    public byte[] descomprime(Map<Byte, Double> map, ArrayList<Integer> fileCompressed, boolean verbose, int tam) {
         Util u = new Util();
         ArrayList<Byte> arrayByte = new ArrayList();
-        int high = 9999;
-        int low = 0;
-        int code = u.getCode(fileCompressed.get(0));
+        float high = 9999;
+        float low = 0;
+        float code = u.getCode(fileCompressed);
         double index;
         double low_freq = 0;
 
@@ -41,7 +41,7 @@ public class CompressorAritmetico {
         while (arrayByte.size() < tam) {
             if (verbose) System.out.println("=====================");
             i++;
-            index = (double) (((code - low) + 1) * 10 - 1) / (high - low + 1);
+            index =  ((((code - low) + 1) * 10 - 1) / (high - low + 1))/10.0;
 
 
             /**
@@ -49,7 +49,7 @@ public class CompressorAritmetico {
              * esteja dentro
              * */
             Iterator it = map.keySet().iterator();
-            while (it.hasNext() && !((low_freq <= (index / 10)) && ((index / 10) < high_freq))) {
+            while (it.hasNext() && !((low_freq <= index) && (index  < high_freq))) {
                 Byte k = (Byte) it.next();
                 abyte = k;
                 try {
@@ -66,12 +66,12 @@ public class CompressorAritmetico {
              **/
             arrayByte.add(abyte);
 
-            int low_aux = low;
-            low = (int) (low_aux + ((high - low_aux + 1) * (low_freq * 10)) / 10);
-            high = (int) (low_aux + ((high - low_aux + 1) * (high_freq * 10)) / 10) - 1;
+            float low_aux = low;
+            low =  Math.round(low_aux + ((high - low_aux + 1) * (low_freq )) / 10);
+            high = Math.round(low_aux + ((high - low_aux + 1) * (high_freq )) / 10) - 1;
 
-            int ultimoDigitoHigh = high / 1000;
-            int ultimoDigitoLow = low / 1000;
+            int ultimoDigitoHigh = (int) high / 1000;
+            int ultimoDigitoLow = (int)low / 1000;
 
             /**
              * Testa o underflow,
@@ -82,8 +82,8 @@ public class CompressorAritmetico {
 
             if (ultimoDigitoHigh - ultimoDigitoLow == 1) {
 
-                String high_string = String.valueOf(high);
-                String low_string = String.valueOf(low);
+                String high_string = String.valueOf((int) high);
+                String low_string = String.valueOf((int) low);
 
                 if (high_string.length() < 3){
                     for (int j = 0; j < 3 ; j++) {
@@ -113,8 +113,8 @@ public class CompressorAritmetico {
                      * transforma a nova string em integer,
                      * e o atribui o high e o low.
                      **/
-                    high = Integer.parseInt(newHigh);
-                    low = Integer.parseInt(newLow);
+                    high = Float.parseFloat(newHigh);
+                    low = Float.parseFloat(newLow);
 
                 }
 
@@ -127,9 +127,10 @@ public class CompressorAritmetico {
                 high = (high - ultimoDigitoHigh) * 10 + 9;
                 low = (low - ultimoDigitoLow) * 10;
 
-                u.atualizaCode(fileCompressed);
-                ultimoDigitoHigh = high / 1000;
-                ultimoDigitoLow = low / 1000;
+                fileCompressed.remove(0);
+                code = u.getCode(fileCompressed);
+                ultimoDigitoHigh = (int) high / 1000;
+                ultimoDigitoLow =(int) low / 1000;
                 System.out.print("underflow | ");
 
             }
@@ -139,7 +140,7 @@ public class CompressorAritmetico {
                 System.out.println("newlow: " + low + "\nnewhigh: " + high);
             }
 
-            code = u.getCode(fileCompressed.get(0));
+
             System.out.println("i:" + i +" | " + fileCompressed);
 
 
@@ -162,12 +163,11 @@ public class CompressorAritmetico {
     }
 
 
-    public ArrayList<String> comprimeFile(ArrayList<Byte> arrayByte, Map<Byte, Double> map, boolean verbose) {
+    public ArrayList<Integer> comprimeFile(ArrayList<Byte> arrayByte, Map<Byte, Double> map, boolean verbose) {
         int high = 9999;
         int low = 0;
-        String underflow = "";
         Util u = new Util();
-        ArrayList<String> saida = new ArrayList<>();
+        ArrayList<Integer> saida = new ArrayList<>();
         int underflow_counter = 0;
         int ultimoDigitoUnderflowlow = 0;
         int ultimoDigitoUnderflowHigh = 9999;
@@ -215,7 +215,7 @@ public class CompressorAritmetico {
 
 
             /**
-             * TODO: documentar melhor aqui
+             * Solução para o underflow
              **/
 
 
@@ -223,6 +223,14 @@ public class CompressorAritmetico {
 
                 String high_string = String.valueOf(high);
                 String low_string = String.valueOf(low);
+
+                /**
+                 * Caso os valores sejam menor do que 1000
+                 * isso faz com que alguns deem erro
+                 * EXEMPLO: 987, quando processado, o seu segundo digito vai o 8
+                 * quando devia ser o 9, pois o numero deve ser cumputado como
+                 * se fosse 0987.
+                 **/
 
                 if (high_string.length() < 3){
                     for (int j = 0; j < 3 ; j++) {
@@ -236,17 +244,26 @@ public class CompressorAritmetico {
                     }
                 }
 
+
+                /**
+                 * Pega o segundo digito
+                 **/
                 int segundoDigitoHigh = Integer.parseInt((String.valueOf(high_string.charAt(1))));
 
                 int segundoDigitoLow = Integer.parseInt((String.valueOf(low_string.charAt(1))));
 
                 /**
                  * Testa se o valor do segundo digito é 0 e 9, pois dai se enquadra
-                 * como o segundo caso de underflow
+                 * como o  underflow
                  **/
 
                 if (segundoDigitoHigh == 0 && segundoDigitoLow == 9){
                     underflow_counter++;
+
+                    /**
+                     * Guarda o segundo digito pra depois saber
+                     * qual valor adicionar na saída.
+                     **/
                     ultimoDigitoUnderflowlow = ultimoDigitoLow;
                     ultimoDigitoUnderflowHigh = ultimoDigitoHigh;
 
@@ -268,56 +285,28 @@ public class CompressorAritmetico {
 
 
             }
-            /**
-             * Caso os valores sejam menor do que 1000
-             * isso faz com que alguns deem erro
-             * EXEMPLO: 987, quando processado, o seu segundo digito vai o 8
-             * quando devia ser o 9, pois o numero deve ser cumputado como
-             * se fosse 0987.
-             **/
 
             while (((ultimoDigitoHigh == ultimoDigitoLow))) {
 
-                underflow = underflow.concat(String.valueOf(ultimoDigitoHigh));
 
-                /**
-                 * Testa se o tamanho da String ainda está
-                 * dentro do valor possível. Caso não esteja,
-                 * guarda na saída e limpa o underflow.
-                 * */
-                if (underflow.length() == 1024) {
-                    saida.add(underflow);
-                    saida.clear();
-                }
+                    saida.add(ultimoDigitoLow);
+
                 /**
                  * Testa se o ocorreu o segundo caso de underflow,
                  * caso tenha acontecido, verifica pra qual o ultimo digito covergiu
                  * case seja o High, coloca "9", caso seja o low, coloca "0"
                  **/
                 if (underflow_counter != 0) {
-                    if (ultimoDigitoUnderflowHigh == ultimoDigitoHigh) {
-                        for (int i_counter = 0; i_counter < underflow_counter; i_counter++) {
-                            underflow = underflow.concat("9");
-                            if (underflow.length() == 1024) {
-                                saida.add(underflow);
-                                saida.clear();
-                            }
-                        }
-                    }
-                    if (ultimoDigitoUnderflowlow == ultimoDigitoLow) {
-                        for (int i_counter = 0; i_counter < underflow_counter; i_counter++) {
-                            underflow = underflow.concat("0");
-                            if (underflow.length() == 1024) {
-                                saida.add(underflow);
-                                saida.clear();
-                            }
-                        }
-                    }
+                    if (ultimoDigitoUnderflowHigh == ultimoDigitoHigh)
+                        for (int i_counter = 0; i_counter < underflow_counter; i_counter++) saida.add(9);
+
+                    if (ultimoDigitoUnderflowlow == ultimoDigitoLow)
+                        for (int i_counter = 0; i_counter < underflow_counter; i_counter++) saida.add(0);
+
                 }
 
                 if (verbose) {
-                    System.out.println("------------");
-                    System.out.println("underflow: "+ underflow);
+                    System.out.println("Shift left");
                 }
                 ultimoDigitoHigh *= 1000;
                 ultimoDigitoLow *= 1000;
@@ -332,9 +321,10 @@ public class CompressorAritmetico {
             }
         }
 
-        if (!underflow.isBlank()) saida.add(underflow);
 
-        saida.add(String.valueOf(low));
+
+
+        u.getLow(saida,low);
 
         if (verbose) System.out.println(saida);
 

@@ -69,62 +69,29 @@ public class Util {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2)-> e1, LinkedHashMap::new));
     }
 
-    int getCode(String code){
+    int getCode(ArrayList<Integer> code) {
 
         /**
          * Função para pegar os 4 primeiros digito do code
          */
-        String value = null;
+        int value = code.get(0);
 
-        switch (code.length()){
-            case 1 :
-                value = code.substring(0,1);
-                break;
-            case 2 :
-                value = code.substring(0,2);
-                break;
-            case 3 :
-                value = code.substring(0,3);
-                break;
-            default: value = code.substring(0,4);
-
-        }
-
-    return Integer.valueOf(value);
-    }
-
-    void atualizaCode(ArrayList<String> arrayList){
-
-        if (arrayList.size() >= 2){
-            for (int i = 0; i < arrayList.size() - 1; i++) {
-
-                String digito_sem_primeiro = arrayList.get(i).substring(1);
-                String primeiro_digito_prox = null;
-
-                primeiro_digito_prox = arrayList.get(i + 1).charAt(0) + "";
-                arrayList.set(i, digito_sem_primeiro.concat(primeiro_digito_prox));
-
-
-                if((i + 1) == arrayList.size()-1) {
-                    String prox_digito_sem_primeiro = arrayList.get(i + 1).substring(1);
-                    arrayList.set(i + 1, prox_digito_sem_primeiro);
-                    if(arrayList.get(i + 1).isEmpty())
-                        arrayList.remove(arrayList.size() - 1);
-                }
+        if (code.size() <= 3){
+            value = 0;
+            for (Integer i : code) {
+                value *= 10;
+                value += i;
             }
-
-        }else {
-            try {
-                String digito_sem_primeiro = arrayList.get(0).substring(1);
-                arrayList.set(0, digito_sem_primeiro);
-            }catch (StringIndexOutOfBoundsException e) {
-                arrayList.remove(0);
-                return;
+        }
+        else{
+            for (int i = 1; i < 4; i++) {
+                value *= 10;
+                value += code.get(i);
             }
         }
 
+    return value;
     }
-
 
 
     void procurarErros(byte[] fileAntigo, byte[] fileNovo)
@@ -143,5 +110,14 @@ public class Util {
     }
 
 
+    public void getLow(ArrayList<Integer> saida, int low) {
 
+        String aux = Integer.toString(low);
+
+        for (int i = 0; i < aux.length(); i++) {
+            saida.add(Character.getNumericValue(aux.charAt(i)));
+        }
+
+
+    }
 }
