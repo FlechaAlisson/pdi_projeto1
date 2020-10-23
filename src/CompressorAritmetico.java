@@ -67,8 +67,8 @@ public class CompressorAritmetico {
             arrayByte.add(abyte);
 
             float low_aux = low;
-            low =  Math.round(low_aux + ((high - low_aux + 1) * (low_freq )) / 10);
-            high = Math.round(low_aux + ((high - low_aux + 1) * (high_freq )) / 10) - 1;
+            low =  Math.round(low_aux + ((high - low_aux + 1) * (low_freq * 10 )) / 10);
+            high = Math.round(low_aux + ((high - low_aux + 1) * (high_freq * 10 )) / 10) - 1;
 
             int ultimoDigitoHigh = (int) high / 1000;
             int ultimoDigitoLow = (int)low / 1000;
