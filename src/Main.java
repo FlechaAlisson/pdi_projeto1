@@ -95,12 +95,7 @@ public class Main {
         fim  = System.currentTimeMillis();
         System.out.println("Tempo de execucao: " + (double) ((fim - inicio)) + " milissegundos" );
 
+
         u.procurarErros(file, finalFile);
-
-
-
     }
-
-
-
 }

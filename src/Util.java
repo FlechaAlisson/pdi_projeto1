@@ -45,7 +45,7 @@ public class Util {
         */
         prob.forEach((k,v) -> prob.put(k, v/file.length));
 
-        BigDecimal aux = new BigDecimal(0).setScale(5, RoundingMode.HALF_EVEN);
+        BigDecimal aux = new BigDecimal(0).setScale(4, RoundingMode.HALF_EVEN);
 
 
         /**
@@ -53,7 +53,7 @@ public class Util {
          */
         for (Map.Entry<Byte,Double> pair : prob.entrySet()
         ) {
-            BigDecimal value = new BigDecimal(pair.getValue()).setScale(5, RoundingMode.HALF_EVEN);
+            BigDecimal value = new BigDecimal(pair.getValue()).setScale(4, RoundingMode.HALF_EVEN);
             aux = aux.add(value);
             if (aux.doubleValue() > 1) aux = BigDecimal.valueOf(1);
             pair.setValue(aux.doubleValue());
@@ -119,5 +119,14 @@ public class Util {
         }
 
 
+    }
+
+    public String checkLength(String num) {
+        if (num.length() <= 3){
+            for (int j = 0; num.length() < 4  ; j++) {
+                num = "0" + num;
+            }
+        }
+        return num;
     }
 }

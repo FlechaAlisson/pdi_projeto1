@@ -67,8 +67,8 @@ public class CompressorAritmetico {
             arrayByte.add(abyte);
 
             float low_aux = low;
-            low =  Math.round(low_aux + ((high - low_aux + 1) * (low_freq * 10 )) / 10);
-            high = Math.round(low_aux + ((high - low_aux + 1) * (high_freq * 10 )) / 10) - 1;
+            low =  (int) (low_aux + ((high - low_aux + 1) * (low_freq * 10 )) / 10);
+            high = (int) (low_aux + ((high - low_aux + 1) * (high_freq * 10 )) / 10) - 1;
 
             int ultimoDigitoHigh = (int) high / 1000;
             int ultimoDigitoLow = (int)low / 1000;
@@ -85,39 +85,43 @@ public class CompressorAritmetico {
                 String high_string = String.valueOf((int) high);
                 String low_string = String.valueOf((int) low);
 
-                if (high_string.length() < 3){
-                    for (int j = 0; j < 3 ; j++) {
-                        high_string = "0" + high_string;
-                    }
-                }
-                if (low_string.length() < 4){
-                    for (int j = 0; j < 3 ; j++) {
-                        low_string = "0" + low_string;
-                    }
-                }
+
+
+                /**
+                 * Checa se o numero é menor de que 999
+                 * se for, coloca 0s a esquerda para que
+                 * o numero tenha 4 caractéres.
+                 **/
+                high_string = u.checkLength(high_string);
+                low_string = u.checkLength(low_string);
+
+                /**
+                 * Pega o segundo caractér.
+                 **/
                 int segundoDigitoHigh = Integer.parseInt((String.valueOf(high_string.charAt(1))));
                 int segundoDigitoLow = Integer.parseInt((String.valueOf(low_string.charAt(1))));
 
                 /**
                  * Testa se o valor do segundo digito é 0 e 9, pois dai se enquadra
-                 * como o segundo caso de underflow
+                 * como um caso de underflow
                  **/
-
                 if (segundoDigitoHigh == 0 && segundoDigitoLow == 9){
                     /**
-                     * Cria uma nova string onde retira-se o segundo digito.
+                     * Cria uma nova string onde retira-se o segundo digito
+                     * e acrescenta um 0 ou um 9 dependendo se é high ou se
+                     * é low
                      **/
+
                     String newHigh = String.valueOf(high).substring(0,1) + String.valueOf(high).substring(2) + "9";
                     String newLow = String.valueOf(low).substring(0,1) + String.valueOf(low).substring(2) + "0";
+
                     /**
                      * transforma a nova string em integer,
                      * e o atribui o high e o low.
                      **/
                     high = Float.parseFloat(newHigh);
                     low = Float.parseFloat(newLow);
-
                 }
-
 
             }
 
@@ -131,22 +135,17 @@ public class CompressorAritmetico {
                 code = u.getCode(fileCompressed);
                 ultimoDigitoHigh = (int) high / 1000;
                 ultimoDigitoLow =(int) low / 1000;
-                System.out.print("underflow | ");
+                System.out.print("shift_left | ");
 
             }
+            System.out.println("");
             if (verbose) {
 
                 System.out.println("lowfreq: " + low_freq + "\nhighfreq: " + high_freq);
                 System.out.println("newlow: " + low + "\nnewhigh: " + high);
             }
 
-
-            System.out.println("i:" + i +" | " + fileCompressed);
-
-
-
         }
-
 
         /***
          * Transforma o Arraylist em vetor.
@@ -232,17 +231,8 @@ public class CompressorAritmetico {
                  * se fosse 0987.
                  **/
 
-                if (high_string.length() < 3){
-                    for (int j = 0; j < 3 ; j++) {
-                        high_string = "0" + high_string;
-                    }
-                }
-
-                if (low_string.length() < 4){
-                    for (int j = 0; j < 3 ; j++) {
-                        low_string = "0" + low_string;
-                    }
-                }
+                high_string = u.checkLength(high_string);
+                low_string = u.checkLength(low_string);
 
 
                 /**
