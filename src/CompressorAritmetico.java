@@ -79,7 +79,6 @@ public class CompressorAritmetico {
              * e o Code
              **/
 
-
             if (ultimoDigitoHigh - ultimoDigitoLow == 1) {
 
                 String high_string = String.valueOf((int) high);
