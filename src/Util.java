@@ -45,7 +45,7 @@ public class Util {
         */
         prob.forEach((k,v) -> prob.put(k, v/file.length));
 
-        BigDecimal aux = new BigDecimal(0).setScale(5, RoundingMode.HALF_EVEN);
+        double aux = 0;
 
 
         /**
@@ -53,10 +53,11 @@ public class Util {
          */
         for (Map.Entry<Byte,Double> pair : prob.entrySet()
         ) {
-            BigDecimal value = new BigDecimal(pair.getValue()).setScale(5, RoundingMode.HALF_EVEN);
-            aux = aux.add(value);
-            if (aux.doubleValue() > 1) aux = BigDecimal.valueOf(1);
-            pair.setValue(aux.doubleValue());
+
+            double value = pair.getValue();
+            aux+= value;
+            if (aux > 1) aux = 1;
+            pair.setValue(aux);
         }
 
 
@@ -83,7 +84,7 @@ public class Util {
                 value += i;
             }
         }
-        else{
+        else {
             for (int i = 1; i < 4; i++) {
                 value *= 10;
                 value += code.get(i);
@@ -107,12 +108,13 @@ public class Util {
             }
         }
         System.out.println("TOTAL DE ERROS: " + erros_total);
+        System.out.println("TOTAL DE BYTES: "+ fileAntigo.length);
     }
 
 
-    public void getLow(ArrayList<Integer> saida, int low) {
+    public void getLow(ArrayList<Integer> saida, double low) {
 
-        String aux = Integer.toString(low);
+        String aux = Integer.toString((int) low);
 
         for (int i = 0; i < aux.length(); i++) {
             saida.add(Character.getNumericValue(aux.charAt(i)));
@@ -121,6 +123,14 @@ public class Util {
 
     }
 
+
+    /**
+     * Caso os valores sejam menor do que 1000
+     * isso faz com que alguns deem erro
+     * EXEMPLO: 987, quando processado, o seu segundo digito vai o 8
+     * quando devia ser o 9, pois o numero deve ser cumputado como
+     * se fosse 0987.
+     **/
     public String checkLength(String num) {
         if (num.length() <= 3){
             for (int j = 0; num.length() < 4  ; j++) {
@@ -128,5 +138,11 @@ public class Util {
             }
         }
         return num;
+    }
+
+    public int getSegundoDigito(int number) {
+        String number_string = String.valueOf(number);
+        number_string = this.checkLength(number_string);
+        return Integer.parseInt((String.valueOf(number_string.charAt(1))));
     }
 }

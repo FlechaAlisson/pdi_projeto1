@@ -27,6 +27,7 @@ public class FileHandler {
     }
 
 
+
     public void writeFile(ArrayList<Integer> saida, Map<Byte, Double> ocorrencia, int tam) throws IOException {
 
         FileOutputStream f = null;

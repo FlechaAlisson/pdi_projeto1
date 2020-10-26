@@ -1,5 +1,7 @@
 
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 public class CompressorAritmetico {
@@ -41,7 +43,9 @@ public class CompressorAritmetico {
         while (arrayByte.size() < tam) {
             if (verbose) System.out.println("=====================");
             i++;
-            index =  ((((code - low) + 1) * 10 - 1) / (high - low + 1))/10.0;
+            index = ((((code - low) + 1) * 10 - 1) / (high - low + 1))/10.0;
+
+
 
 
             /**
@@ -134,12 +138,11 @@ public class CompressorAritmetico {
                 code = u.getCode(fileCompressed);
                 ultimoDigitoHigh = (int) high / 1000;
                 ultimoDigitoLow =(int) low / 1000;
-                System.out.print("shift_left | ");
+                if (verbose) System.out.print("shift_left | ");
 
             }
-            System.out.println("");
             if (verbose) {
-
+                System.out.println("");
                 System.out.println("lowfreq: " + low_freq + "\nhighfreq: " + high_freq);
                 System.out.println("newlow: " + low + "\nnewhigh: " + high);
             }
@@ -162,8 +165,8 @@ public class CompressorAritmetico {
 
 
     public ArrayList<Integer> comprimeFile(ArrayList<Byte> arrayByte, Map<Byte, Double> map, boolean verbose) {
-        int high = 9999;
-        int low = 0;
+        double high = 9999999;
+        double low = 0;
         Util u = new Util();
         ArrayList<Integer> saida = new ArrayList<>();
         int underflow_counter = 0;
@@ -199,86 +202,66 @@ public class CompressorAritmetico {
                 System.out.println("prob_inicial: " + prob_inicial);
                 System.out.println("prob_final: " + prob_final);
             }
-            int old_low = low;
+            double old_low = low;
             low = (int)(old_low + (high - old_low + 1) * prob_inicial);
             high = (int) (old_low + (high - old_low + 1) * prob_final) - 1;
 
             if (verbose){
-                System.out.println("new_low: " + low);
                 System.out.println("new_high: " + high);
+                System.out.println("new_low: " + low);
             }
 
-            int ultimoDigitoHigh = high / 1000;
-            int ultimoDigitoLow = low / 1000;
+            int ultimoDigitoHigh = (int) high / 1000;
+            int ultimoDigitoLow = (int)  low / 1000;
 
+
+            int segundoDigitoHigh = u.getSegundoDigito((int) high);
+            int segundoDigitoLow= u.getSegundoDigito((int) low);
 
             /**
              * Solução para o underflow
              **/
+            while ((ultimoDigitoHigh - ultimoDigitoLow == 1) &&
+                    (segundoDigitoHigh == 0 && segundoDigitoLow == 9)) {
 
 
-            if (ultimoDigitoHigh - ultimoDigitoLow == 1) {
-
-                String high_string = String.valueOf(high);
-                String low_string = String.valueOf(low);
-
-                /**
-                 * Caso os valores sejam menor do que 1000
-                 * isso faz com que alguns deem erro
-                 * EXEMPLO: 987, quando processado, o seu segundo digito vai o 8
-                 * quando devia ser o 9, pois o numero deve ser cumputado como
-                 * se fosse 0987.
-                 **/
-
-                high_string = u.checkLength(high_string);
-                low_string = u.checkLength(low_string);
-
+                String high_string = u.checkLength(String.valueOf((int) high));
+                String low_string =  u.checkLength(String.valueOf((int) low));
+                underflow_counter++;
 
                 /**
-                 * Pega o segundo digito
+                 * Guarda o ultimo digito pra depois saber
+                 * qual valor adicionar na saída.
                  **/
-                int segundoDigitoHigh = Integer.parseInt((String.valueOf(high_string.charAt(1))));
+                ultimoDigitoUnderflowlow = ultimoDigitoLow;
+                ultimoDigitoUnderflowHigh = ultimoDigitoHigh;
+                /**
+                 * Cria uma nova string onde retira-se o segundo digito.
+                 **/
+                String newHigh = high_string.substring(0,1) + high_string.substring(2) + "9";
+                String newLow = low_string.substring(0,1) + low_string.substring(2) + "0";
 
-                int segundoDigitoLow = Integer.parseInt((String.valueOf(low_string.charAt(1))));
 
                 /**
-                 * Testa se o valor do segundo digito é 0 e 9, pois dai se enquadra
-                 * como o  underflow
+                 * transforma a nova string em integer,
+                 * e o atribui o high e o low.
                  **/
+                high = Integer.parseInt(newHigh);
+                low = Integer.parseInt(newLow);
 
-                if (segundoDigitoHigh == 0 && segundoDigitoLow == 9){
-                    underflow_counter++;
-
-                    /**
-                     * Guarda o segundo digito pra depois saber
-                     * qual valor adicionar na saída.
-                     **/
-                    ultimoDigitoUnderflowlow = ultimoDigitoLow;
-                    ultimoDigitoUnderflowHigh = ultimoDigitoHigh;
-
-                    /**
-                     * Cria uma nova string onde retira-se o segundo digito.
-                    **/
-                    String newHigh = String.valueOf(high).substring(0,1) + String.valueOf(high).substring(2) + "9";
-                    String newLow = String.valueOf(low).substring(0,1) + String.valueOf(low).substring(2) + "0";
-
-
-                    /**
-                     * transforma a nova string em integer,
-                     * e o atribui o high e o low.
-                     **/
-                    high = Integer.parseInt(newHigh);
-                    low = Integer.parseInt(newLow);
-
+                ultimoDigitoHigh = (int) high / 1000;
+                ultimoDigitoLow = (int)  low / 1000;
+                segundoDigitoHigh = u.getSegundoDigito((int) high);
+                segundoDigitoLow= u.getSegundoDigito((int) low);
+                if (verbose){
+                    System.out.println("Underflow");
+                    System.out.println("\tnew_high: " + high + "\n\tnew_low: "+low);
                 }
 
-
             }
-
             while (((ultimoDigitoHigh == ultimoDigitoLow))) {
 
-
-                    saida.add(ultimoDigitoLow);
+                saida.add(ultimoDigitoLow);
 
                 /**
                  * Testa se o ocorreu o segundo caso de underflow,
@@ -288,10 +271,10 @@ public class CompressorAritmetico {
                 if (underflow_counter != 0) {
                     if (ultimoDigitoUnderflowHigh == ultimoDigitoHigh)
                         for (int i_counter = 0; i_counter < underflow_counter; i_counter++) saida.add(9);
-
                     if (ultimoDigitoUnderflowlow == ultimoDigitoLow)
                         for (int i_counter = 0; i_counter < underflow_counter; i_counter++) saida.add(0);
 
+                    underflow_counter = 0;
                 }
 
                 if (verbose) {
@@ -305,10 +288,12 @@ public class CompressorAritmetico {
 
                 if (verbose) System.out.println("\tnew_high: " + high + "\n\tnew_low: "+low);
 
-                ultimoDigitoHigh = high / 1000;
-                ultimoDigitoLow = low / 1000;
+                ultimoDigitoHigh = (int)  high / 1000;
+                ultimoDigitoLow = (int)  low / 1000;
             }
         }
+
+
 
 
 
