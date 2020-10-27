@@ -1,4 +1,5 @@
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,36 +29,38 @@ public class Util {
 
 
 
-    public Map<Byte, Double> getModeloProb(byte[] file) {
-        Map<Byte, Double> prob = new HashMap<>();
+    public Map<Byte, BigDecimal> getModeloProb(byte[] file) {
+        Map<Byte, BigDecimal> prob = new HashMap<>();
 
 
         for (byte b : file) {
             if (prob.containsKey(b)) {
-                prob.put(b, prob.get(b) + 1);
+                BigDecimal value = prob.get(b);
+                prob.put(b, new BigDecimal(value.doubleValue() + 1));
             } else {
-                prob.put(b, (double) 1);
+                prob.put(b, new BigDecimal(1));
             }
         }
 
         /**
          * Probabilidade
         */
-        prob.forEach((k,v) -> prob.put(k, v/file.length));
 
-        double aux = 0;
+        prob.forEach((k,v) -> prob.put(k, v.divide(BigDecimal.valueOf(file.length),MathContext.DECIMAL32)));
+
+        BigDecimal aux = new BigDecimal(0);
 
 
         /**
          * Probabilidade acumulada
          */
-        for (Map.Entry<Byte,Double> pair : prob.entrySet()
+        for (Map.Entry<Byte,BigDecimal> pair : prob.entrySet()
         ) {
 
-            double value = pair.getValue();
-            aux+= value;
-            if (aux > 1) aux = 1;
-            pair.setValue(aux);
+            BigDecimal value = pair.getValue().setScale(3, RoundingMode.HALF_EVEN);
+            aux = aux.add(value);
+            if (aux.doubleValue() <= 1) pair.setValue(aux);
+            else pair.setValue(BigDecimal.ONE);
         }
 
 
@@ -100,13 +103,12 @@ public class Util {
         int erros_total = 0;
         for (int i = 0; i < fileAntigo.length; i++) {
             if (fileAntigo[i] != fileNovo[i]) {
-                System.out.println("=====================");
-                System.out.println("Erro no byte: " + fileNovo[i] +
-                        "\nDevia Ser: " + fileAntigo[i] +
-                        "\nPosicao: " + i);
+                System.out.print("Byte original: " + fileAntigo[i] + ", Byte novo: " + fileNovo[i] +
+                        ", pos: " + i +" | ");
                 erros_total++;
             }
         }
+        System.out.println("");
         System.out.println("TOTAL DE ERROS: " + erros_total);
         System.out.println("TOTAL DE BYTES: "+ fileAntigo.length);
     }
@@ -145,4 +147,5 @@ public class Util {
         number_string = this.checkLength(number_string);
         return Integer.parseInt((String.valueOf(number_string.charAt(1))));
     }
+
 }

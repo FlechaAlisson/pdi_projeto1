@@ -23,18 +23,18 @@ public class CompressorAritmetico {
      * Essa função vai retornar um array de byte.
      */
 
-    public byte[] descomprime(Map<Byte, Double> map, ArrayList<Integer> fileCompressed, boolean verbose, int tam) {
+    public byte[] descomprime(Map<Byte, BigDecimal> map, ArrayList<Integer> fileCompressed, boolean verbose, int tam) {
         Util u = new Util();
         ArrayList<Byte> arrayByte = new ArrayList();
         float high = 9999;
         float low = 0;
         float code = u.getCode(fileCompressed);
         double index;
-        double low_freq = 0;
+        BigDecimal low_freq = new BigDecimal(0);
 
         /**Pega o primeira frequencia do map
          * */
-        double high_freq = map.entrySet().iterator().next().getValue();
+        BigDecimal high_freq = map.entrySet().iterator().next().getValue();
 
         /**Pega o primeiro byte do Map
          * **/
@@ -53,14 +53,12 @@ public class CompressorAritmetico {
              * esteja dentro
              * */
             Iterator it = map.keySet().iterator();
-            while (it.hasNext() && !((low_freq <= index) && (index  < high_freq))) {
+            while (it.hasNext() && !((low_freq.doubleValue() <= index) && (index  < high_freq.doubleValue()))) {
                 Byte k = (Byte) it.next();
                 abyte = k;
-                try {
-                    low_freq = map.get(u.getLowerKey(map, k));
-                } catch (NullPointerException e) {
-                    low_freq = 0;
-                }
+                low_freq = map.get(u.getLowerKey(map, k));
+                if (low_freq == null) low_freq = BigDecimal.ZERO;
+
                 high_freq = map.get(k);
 
             }
@@ -71,8 +69,8 @@ public class CompressorAritmetico {
             arrayByte.add(abyte);
 
             float low_aux = low;
-            low =  (int) (low_aux + ((high - low_aux + 1) * (low_freq * 10 )) / 10);
-            high = (int) (low_aux + ((high - low_aux + 1) * (high_freq * 10 )) / 10) - 1;
+            low =  (int) (low_aux + ((high - low_aux + 1) * (low_freq.doubleValue() * 10 )) / 10);
+            high = (int) (low_aux + ((high - low_aux + 1) * (high_freq.doubleValue() * 10 )) / 10) - 1;
 
             int ultimoDigitoHigh = (int) high / 1000;
             int ultimoDigitoLow = (int)low / 1000;
@@ -83,50 +81,40 @@ public class CompressorAritmetico {
              * e o Code
              **/
 
-            if (ultimoDigitoHigh - ultimoDigitoLow == 1) {
+            int segundoDigitoHigh = u.getSegundoDigito((int) high);
+            int segundoDigitoLow= u.getSegundoDigito((int) low);
 
-                String high_string = String.valueOf((int) high);
-                String low_string = String.valueOf((int) low);
+            /**
+             * Solução para o underflow
+             **/
+            while ((ultimoDigitoHigh - ultimoDigitoLow == 1) &&
+                    (segundoDigitoHigh == 0 && segundoDigitoLow == 9)) {
 
-
-
+                String high_string = u.checkLength(String.valueOf((int) high));
+                String low_string =  u.checkLength(String.valueOf((int) low));
                 /**
-                 * Checa se o numero é menor de que 999
-                 * se for, coloca 0s a esquerda para que
-                 * o numero tenha 4 caractéres.
+                 * Cria uma nova string onde retira-se o segundo digito.
                  **/
-                high_string = u.checkLength(high_string);
-                low_string = u.checkLength(low_string);
-
+                String newHigh = high_string.substring(0,1) + high_string.substring(2) + "9";
+                String newLow = low_string.substring(0,1) + low_string.substring(2) + "0";
                 /**
-                 * Pega o segundo caractér.
+                 * transforma a nova string em integer,
+                 * e o atribui o high e o low.
                  **/
-                int segundoDigitoHigh = Integer.parseInt((String.valueOf(high_string.charAt(1))));
-                int segundoDigitoLow = Integer.parseInt((String.valueOf(low_string.charAt(1))));
+                high = Integer.parseInt(newHigh);
+                low = Integer.parseInt(newLow);
 
-                /**
-                 * Testa se o valor do segundo digito é 0 e 9, pois dai se enquadra
-                 * como um caso de underflow
-                 **/
-                if (segundoDigitoHigh == 0 && segundoDigitoLow == 9){
-                    /**
-                     * Cria uma nova string onde retira-se o segundo digito
-                     * e acrescenta um 0 ou um 9 dependendo se é high ou se
-                     * é low
-                     **/
-
-                    String newHigh = String.valueOf(high).substring(0,1) + String.valueOf(high).substring(2) + "9";
-                    String newLow = String.valueOf(low).substring(0,1) + String.valueOf(low).substring(2) + "0";
-
-                    /**
-                     * transforma a nova string em integer,
-                     * e o atribui o high e o low.
-                     **/
-                    high = Float.parseFloat(newHigh);
-                    low = Float.parseFloat(newLow);
+                ultimoDigitoHigh = (int) high / 1000;
+                ultimoDigitoLow = (int)  low / 1000;
+                segundoDigitoHigh = u.getSegundoDigito((int) high);
+                segundoDigitoLow= u.getSegundoDigito((int) low);
+                if (verbose){
+                    System.out.println("Underflow");
+                    System.out.println("\tnew_high: " + high + "\n\tnew_low: "+low);
                 }
 
             }
+
 
             while (ultimoDigitoHigh == ultimoDigitoLow) {
                 ultimoDigitoHigh *= 1000;
@@ -139,6 +127,10 @@ public class CompressorAritmetico {
                 ultimoDigitoHigh = (int) high / 1000;
                 ultimoDigitoLow =(int) low / 1000;
                 if (verbose) System.out.print("shift_left | ");
+
+
+
+
 
             }
             if (verbose) {
@@ -164,9 +156,9 @@ public class CompressorAritmetico {
     }
 
 
-    public ArrayList<Integer> comprimeFile(ArrayList<Byte> arrayByte, Map<Byte, Double> map, boolean verbose) {
-        double high = 9999999;
-        double low = 0;
+    public ArrayList<Integer> comprimeFile(ArrayList<Byte> arrayByte, Map<Byte, BigDecimal> map, boolean verbose) {
+        int high = 9999;
+        int low = 0;
         Util u = new Util();
         ArrayList<Integer> saida = new ArrayList<>();
         int underflow_counter = 0;
@@ -178,7 +170,7 @@ public class CompressorAritmetico {
         for (Byte b : arrayByte) {
 
             i++;
-            double prob_inicial;
+            BigDecimal prob_inicial;
 
 
             /**
@@ -186,12 +178,11 @@ public class CompressorAritmetico {
              * então atribui 0. Só ocorre caso esteja processando o byte correspondente a primeira chave
              * do Map.
              */
-            try {
-                prob_inicial = map.get(u.getLowerKey(map, b));
-            } catch (NullPointerException e) {
-                prob_inicial = 0;
-            }
-            double prob_final = map.get(b);
+
+            prob_inicial = map.get(u.getLowerKey(map, b));
+            if (prob_inicial == null) prob_inicial = BigDecimal.ZERO;
+
+            BigDecimal prob_final = map.get(b);
 
 
             if (verbose) {
@@ -203,8 +194,8 @@ public class CompressorAritmetico {
                 System.out.println("prob_final: " + prob_final);
             }
             double old_low = low;
-            low = (int)(old_low + (high - old_low + 1) * prob_inicial);
-            high = (int) (old_low + (high - old_low + 1) * prob_final) - 1;
+            low = (int)(old_low + (high - old_low + 1) * prob_inicial.doubleValue());
+            high = (int)(old_low + (high - old_low + 1) * prob_final.doubleValue()) - 1;
 
             if (verbose){
                 System.out.println("new_high: " + high);
@@ -291,6 +282,8 @@ public class CompressorAritmetico {
                 ultimoDigitoHigh = (int)  high / 1000;
                 ultimoDigitoLow = (int)  low / 1000;
             }
+
+            System.out.println("Saida: " + saida);
         }
 
 
